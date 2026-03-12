@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Report — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <h2 class="page-title mb-0">Report #{{ report.pk }}</h2>
+            <a class="btn btn-outline-secondary" href="{% url 'moderation:reports' %}">Back to reports</a>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body p-4">
+                <div class="text-muted small">Content</div>
+                <div class="fw-semibold">{{ report.content_type.app_label }}.{{ report.content_type.model }}:{{ report.object_id }}</div>
+                <div class="text-muted small mt-3">Reason</div>
+                <div>{{ report.reason }}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="fw-bold mb-0">Resolve</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Action</label>
+                        {{ form.action }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Resolution notes</label>
+                        {{ form.resolution_notes }}
+                    </div>
+                    <button class="btn btn-outline-secondary" type="submit">Resolve</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Open Disputes — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <h2 class="page-title mb-0"><i class="bi bi-exclamation-diamond me-2"></i>Disputes</h2>
+            <a class="btn btn-outline-secondary" href="{% url 'moderation:dashboard' %}">Back to dashboard</a>
+        </div>
+
+        <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject</th>
+                        <th>Opened by</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in disputes %}
+                    <tr>
+                        <td class="fw-semibold">#{{ d.pk }}</td>
+                        <td>{{ d.subject }}</td>
+                        <td class="text-muted small">{{ d.opened_by.get_full_name|default:d.opened_by.email|default:"—" }}</td>
+                        <td>
+                            {% if d.status == 'open' %}<span class="badge bg-warning text-dark">Open</span>{% else %}<span class="badge bg-secondary">Closed</span>{% endif %}
+                        </td>
+                        <td class="text-muted small">{{ d.created_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">No disputes.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+

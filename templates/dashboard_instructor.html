@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Instructor Dashboard — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <h2 class="page-title"><i class="bi bi-person-badge me-2 text-success"></i>Instructor Dashboard</h2>
+
+        <!-- Overview: stat cards (same style as moderator dashboard) -->
+        <h6 class="fw-bold mb-3">Overview</h6>
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">My courses</div>
+                    <div class="stat-count">{{ courses_teaching_count }}</div>
+                    <a class="btn-card" href="{% url 'courses:teaching' %}">Manage courses</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Enrollments (my courses)</div>
+                    <div class="stat-count">{{ total_enrollments_my }}</div>
+                    <a class="btn-card" href="{% url 'enrollment:instructor_enrollments' %}">View enrollments</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Pending approval</div>
+                    <div class="stat-count">{{ pending_submissions_my }}</div>
+                    <a class="btn-card" href="{% url 'courses:teaching' %}">My courses</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Quizzes</div>
+                    <div class="stat-count">{{ quizzes_count }}</div>
+                    <a class="btn-card" href="{% url 'quizzes:list' %}">Manage quizzes</a>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Assignments</div>
+                    <div class="stat-count">{{ assignments_count }}</div>
+                    <a class="btn-card" href="{% url 'assignments:teaching_list' %}">Manage assignments</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Upcoming live sessions</div>
+                    <div class="stat-count">{{ live_sessions_upcoming }}</div>
+                    <a class="btn-card" href="{% url 'conferences:list' %}">Live sessions</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses I teach + Enrolled / Live -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">Courses I teach</h6>
+                        <a href="{% url 'courses:teaching' %}" class="btn btn-sm btn-outline-primary">View all</a>
+                    </div>
+                    <div class="card-body">
+                        {% if taught_courses %}
+                        <div class="list-group list-group-flush">
+                            {% for course in taught_courses %}
+                            <div class="list-group-item d-flex align-items-center gap-3">
+                                {% if course.image_if_exists %}
+                                <img src="{{ course.image_if_exists.url }}" alt="" class="rounded flex-shrink-0" style="width:48px;height:48px;object-fit:cover">
+                                {% else %}
+                                <div class="rounded bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width:48px;height:48px"><i class="bi bi-book"></i></div>
+                                {% endif %}
+                                <div class="flex-grow-1 min-width-0">
+                                    <div class="fw-semibold">{{ course.fullname }}</div>
+                                    <small class="text-muted">{{ course.shortname }}{% if course.status == 'submitted' %} · Pending approval{% elif course.status == 'needs_revision' %} · Needs revision{% endif %}</small>
+                                </div>
+                                <div class="btn-group btn-group-sm flex-shrink-0">
+                                    <a class="btn btn-outline-primary" href="{% url 'courses:content' pk=course.pk %}">Content</a>
+                                    <a class="btn btn-outline-secondary" href="{% url 'courses:edit' pk=course.pk %}">Edit</a>
+                                    <a class="btn btn-outline-secondary" href="{% url 'courses:detail' pk=course.pk %}">View</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">No courses yet. Create one to add learning materials and enroll students.</p>
+                        <a href="{% url 'courses:create' %}" class="btn btn-primary btn-sm mt-2">Create course</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header py-3">
+                        <h6 class="fw-bold mb-0">Live sessions</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">Schedule live briefings linked to a course (title, time, period).</p>
+                        <a href="{% url 'conferences:create' %}" class="btn btn-primary btn-sm w-100 mb-2">
+                            <i class="bi bi-camera-video me-1"></i>Prepare live session
+                        </a>
+                        <a href="{% url 'conferences:list' %}" class="btn btn-outline-secondary btn-sm w-100">View all sessions</a>
+                    </div>
+                </div>
+
+                {% if enrolled_courses %}
+                <div class="card mt-3">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">Enrolled as student</h6>
+                        <a href="{% url 'enrollment:my_courses' %}" class="btn btn-sm btn-outline-primary">View all</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for enrollment in enrolled_courses %}
+                            <a href="{% url 'courses:content' pk=enrollment.course.pk %}" class="list-group-item list-group-item-action small">
+                                {{ enrollment.course.fullname }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick links (same style as moderator) -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Quick links</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-outline-secondary" href="{% url 'courses:create' %}">
+                        <i class="bi bi-plus-circle me-1"></i>Create course
+                    </a>
+                    <a class="btn btn-outline-secondary" href="{% url 'courses:teaching' %}">
+                        <i class="bi bi-book me-1"></i>My courses
+                    </a>
+                    <a class="btn btn-outline-secondary" href="{% url 'quizzes:list' %}">
+                        <i class="bi bi-patch-question me-1"></i>Quizzes
+                    </a>
+                    <a class="btn btn-outline-secondary" href="{% url 'conferences:list' %}">
+                        <i class="bi bi-camera-video me-1"></i>Live sessions
+                    </a>
+                    <a class="btn btn-outline-secondary" href="{% url 'conferences:create' %}">
+                        <i class="bi bi-camera-video-fill me-1"></i>Prepare live session
+                    </a>
+                    <a class="btn btn-outline-secondary" href="{% url 'enrollment:study_list' %}">
+                        <i class="bi bi-bookmark-star me-1"></i>Study list
+                    </a>
+                    <a class="btn btn-outline-secondary" href="{% url 'courses:list' %}">
+                        <i class="bi bi-collection me-1"></i>Browse all courses
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

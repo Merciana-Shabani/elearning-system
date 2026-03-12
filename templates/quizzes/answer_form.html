@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add answer — {{ question.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'quizzes:list' %}">Quizzes</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'quizzes:detail' pk=quiz.pk %}">{{ quiz.name }}</a></li>
+            <li class="breadcrumb-item active">Add answer</li>
+        </ol>
+    </nav>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h4 class="card-title mb-2">Add answer option</h4>
+            <p class="text-muted small mb-4">Question: {{ question.name }}</p>
+            <form method="post">
+                {% csrf_token %}
+                {% crispy form %}
+            </form>
+            <p class="text-muted small mt-2">Set <strong>Correct (1)</strong> for the right option(s) so the quiz can be marked automatically.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

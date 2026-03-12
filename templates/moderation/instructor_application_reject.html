@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Reject Application — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <h2 class="page-title">Reject instructor application</h2>
+        <p class="text-muted mb-3"><strong>{{ application.user.get_full_name|default:application.user.email }}</strong></p>
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Reason <span class="text-danger">*</span></label>
+                        {{ form.decision_reason }}
+                        {% if form.decision_reason.errors %}
+                            <div class="text-danger small mt-1">{{ form.decision_reason.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <button class="btn btn-outline-secondary" type="submit">Reject</button>
+                    <a class="btn btn-outline-secondary" href="{% url 'moderation:instructor_applications' %}">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

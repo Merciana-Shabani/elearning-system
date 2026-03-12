@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Flagged Content Reports — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <h2 class="fw-bold mb-0"><i class="bi bi-flag me-2"></i>Flagged Content Reports</h2>
+        <a class="btn btn-outline-secondary" href="{% url 'moderation:dashboard' %}">Back to dashboard</a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Content</th>
+                        <th>Reporter</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reports %}
+                    <tr>
+                        <td class="fw-semibold">#{{ r.pk }}</td>
+                        <td class="text-muted small">{{ r.content_type.app_label }}.{{ r.content_type.model }}:{{ r.object_id }}</td>
+                        <td class="text-muted small">{{ r.reporter.get_full_name|default:r.reporter.email|default:"—" }}</td>
+                        <td>
+                            {% if r.status == 'open' %}<span class="badge bg-warning text-dark">Open</span>{% else %}<span class="badge bg-secondary">Closed</span>{% endif %}
+                        </td>
+                        <td class="text-muted small">{{ r.created_at|date:"M d, Y H:i" }}</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" href="{% url 'moderation:report_detail' pk=r.pk %}">Review</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">No reports.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

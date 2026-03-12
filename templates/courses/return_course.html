@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Return Course for Revision — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <h2 class="page-title">Return for revision: {{ course.fullname }}</h2>
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="post" action="{% url 'courses:return_for_revision' pk=course.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="revision_requests" class="form-label">Revision requests <span class="text-danger">*</span></label>
+                        <textarea name="revision_requests" id="revision_requests" class="form-control" rows="6" required
+                                  placeholder="List the required changes (be specific).">{{ request.POST.revision_requests }}</textarea>
+                        <div class="form-text">The instructor must address these items before resubmitting.</div>
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary">Return for revision</button>
+                    <a href="{% url 'courses:pending_approval' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

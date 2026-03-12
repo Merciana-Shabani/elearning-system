@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ room.title }} — Live Session{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: #0f0f0f; }
+    .navbar, footer, #globalSidebar { display: none !important; }
+    #jitsi-container {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+    .room-topbar {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 10;
+        background: linear-gradient(to bottom, rgba(0,0,0,.75) 0%, transparent 100%);
+        padding: .75rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        pointer-events: none;
+    }
+    .room-topbar > * { pointer-events: all; }
+    .room-badge {
+        background: rgba(220,53,69,.9);
+        color: #fff;
+        border-radius: .4rem;
+        padding: .25rem .6rem;
+        font-size: .78rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+    }
+    .room-badge .dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: #fff;
+        animation: blink 1s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .room-title {
+        color: #fff;
+        font-weight: 600;
+        font-size: .9rem;
+        text-shadow: 0 1px 4px rgba(0,0,0,.8);
+    }
+    .room-actions { display: flex; gap: .5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Floating top bar -->
+<div class="room-topbar">
+    <div class="d-flex align-items-center gap-3">
+        <div class="room-badge">
+            <div class="dot"></div>LIVE
+        </div>
+        <span class="room-title">{{ room.title }}</span>
+        {% if room.course %}
+        <span class="badge bg-primary bg-opacity-75" style="font-size:.72rem;">{{ room.course.shortname }}</span>
+        {% endif %}
+    </div>
+
+    <div class="room-actions">
+        {% if room.host == request.user %}
+        <form action="{% url 'conferences:end' slug=room.room_slug %}" method="post"
+              onsubmit="return confirm('End this session for everyone?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger">
+                <i class="bi bi-stop-circle me-1"></i>End Session
+            </button>
+        </form>
+        {% endif %}
+        <a href="{% url 'conferences:list' %}" class="btn btn-sm btn-outline-light">
+            <i class="bi bi-x-lg"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Jitsi container -->
+<div id="jitsi-container"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+    const domain = 'meet.jit.si';
+    const options = {
+        roomName: '{{ room.jitsi_room_name }}',
+        width: '100%',
+        height: '100%',
+        parentNode: document.getElementById('jitsi-container'),
+
+        userInfo: {
+            displayName: '{{ request.user.get_full_name|default:request.user.username|escapejs }}',
+            email: '{{ request.user.email|escapejs }}',
+        },
+
+        configOverwrite: {
+            startWithAudioMuted: true,
+            startWithVideoMuted: false,
+            enableWelcomePage: false,
+            prejoinPageEnabled: false,
+            disableDeepLinking: true,
+            subject: '{{ room.title|escapejs }}',
+        },
+
+        interfaceConfigOverwrite: {
+            SHOW_JITSI_WATERMARK: false,
+            SHOW_BRAND_WATERMARK: false,
+            DEFAULT_BACKGROUND: '#111',
+            TOOLBAR_BUTTONS: [
+                'microphone', 'camera', 'desktop', 'fullscreen',
+                'fodeviceselection', 'hangup', 'profile', 'chat',
+                'recording', 'sharedvideo', 'settings', 'raisehand',
+                'videoquality', 'filmstrip', 'tileview', 'mute-everyone',
+                'security', 'invite',
+            ],
+        },
+    };
+
+    const api = new JitsiMeetExternalAPI(domain, options);
+
+    // When local user hangs up, redirect to sessions list
+    api.addEventListener('readyToClose', () => {
+        window.location.href = '{% url "conferences:list" %}';
+    });
+
+    // Show/hide topbar on mouse move
+    let hideTimer;
+    const topbar = document.querySelector('.room-topbar');
+    document.addEventListener('mousemove', () => {
+        topbar.style.opacity = '1';
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => { topbar.style.opacity = '0'; }, 4000);
+    });
+    topbar.style.transition = 'opacity .3s ease';
+</script>
+{% endblock %}

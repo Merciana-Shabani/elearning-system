@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="fw-bold mb-4"><i class="bi bi-grid me-2 text-primary"></i>My Dashboard</h2>
+
+    <div class="row g-4">
+        <!-- Enrolled courses -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0">Enrolled courses</h6>
+                    <a href="{% url 'enrollment:my_courses' %}" class="btn btn-sm btn-outline-primary">View all</a>
+                </div>
+                <div class="card-body">
+                    {% if enrolled_courses %}
+                    <div class="list-group list-group-flush">
+                        {% for enrollment in enrolled_courses %}
+                        <a href="{% url 'courses:content' pk=enrollment.course.pk %}" class="list-group-item list-group-item-action d-flex align-items-center gap-3">
+                            {% if enrollment.course.image_if_exists %}
+                            <img src="{{ enrollment.course.image_if_exists.url }}" alt="" class="rounded" style="width:48px;height:48px;object-fit:cover">
+                            {% else %}
+                            <div class="rounded bg-primary text-white d-flex align-items-center justify-content-center" style="width:48px;height:48px"><i class="bi bi-book"></i></div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">{{ enrollment.course.fullname }}</div>
+                                {% if enrollment.course.teacher %}<small class="text-muted">{{ enrollment.course.teacher.get_full_name }}</small>{% endif %}
+                            </div>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">You are not enrolled in any courses yet.</p>
+                    <a href="{% url 'courses:list' %}" class="btn btn-primary btn-sm mt-2">Browse courses</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Taught courses (instructors) -->
+        {% if taught_courses %}
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0">Courses I teach</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for course in taught_courses %}
+                        <a href="{{ course.get_absolute_url }}" class="list-group-item list-group-item-action small">
+                            {{ course.fullname }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'courses:list' %}" class="btn btn-outline-secondary btn-sm mt-2">Manage courses</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Moderator stats -->
+        {% if user.is_moderator and total_users is not None %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Overview</h6>
+                    <div class="row g-3">
+                        <div class="col-md-3"><div class="p-3 bg-light rounded text-center"><div class="fw-bold fs-4">{{ total_users }}</div><small class="text-muted">Users</small></div></div>
+                        <div class="col-md-3"><div class="p-3 bg-light rounded text-center"><div class="fw-bold fs-4">{{ total_courses }}</div><small class="text-muted">Courses</small></div></div>
+                        <div class="col-md-3"><div class="p-3 bg-light rounded text-center"><div class="fw-bold fs-4">{{ total_enrollments }}</div><small class="text-muted">Enrollments</small></div></div>
+                    </div>
+                    {% if recent_users %}
+                    <h6 class="fw-bold mt-3 mb-2">Recent users</h6>
+                    <ul class="list-unstyled mb-0">
+                        {% for u in recent_users|slice:":5" %}
+                        <li><a href="{% url 'users:profile' pk=u.pk %}">{{ u.get_full_name|default:u.username }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

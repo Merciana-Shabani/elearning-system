@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile — Elening LMS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control, .form-select { font-size: .9rem; }
+    .form-control:focus, .form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 .2rem rgba(13,110,253,.15); }
+    textarea.form-control { resize: vertical; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{% url 'users:profile' pk=request.user.pk %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="fw-bold mb-0">Edit Profile</h4>
+            <p class="text-muted small mb-0">Update your personal information and preferences</p>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" novalidate id="editProfileForm">
+        {% csrf_token %}
+
+        <div class="row g-4">
+
+            <!-- Left: Avatar card -->
+            <div class="col-lg-3">
+                <div class="card border-0 shadow-sm text-center p-4" style="position:sticky; top:80px;">
+                    {% if request.user.avatar %}
+                        <img src="{{ request.user.avatar.url }}" id="avatarPreview"
+                             class="rounded-circle mx-auto mb-3 border border-3 border-light shadow-sm"
+                             style="width:100px;height:100px;object-fit:cover;">
+                    {% else %}
+                        <div id="avatarFallback"
+                             class="rounded-circle mx-auto mb-3 bg-primary d-flex align-items-center justify-content-center border border-3 border-light shadow-sm"
+                             style="width:100px;height:100px;">
+                            <span class="text-white fw-bold" style="font-size:2rem;">
+                                {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+                            </span>
+                        </div>
+                        <img src="" id="avatarPreview"
+                             class="rounded-circle mx-auto mb-3 border border-3 border-light shadow-sm d-none"
+                             style="width:100px;height:100px;object-fit:cover;">
+                    {% endif %}
+
+                    <p class="fw-semibold mb-0">{{ request.user.get_full_name|default:request.user.username }}</p>
+                    <p class="text-muted small mb-3">{{ request.user.get_role_display }}</p>
+
+                    <label for="{{ user_form.avatar.id_for_label }}" class="btn btn-outline-primary btn-sm w-100" style="cursor:pointer;">
+                        <i class="bi bi-camera me-1"></i>Change Photo
+                    </label>
+                    <div class="visually-hidden">{{ user_form.avatar }}</div>
+                    {% if user_form.avatar.errors %}
+                    <div class="text-danger small mt-1">{{ user_form.avatar.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right: Sections -->
+            <div class="col-lg-9">
+
+                <!-- Personal Info -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-person-circle text-primary me-2"></i>Personal Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.first_name.id_for_label }}">First name</label>
+                                {{ user_form.first_name }}
+                                {% if user_form.first_name.errors %}<div class="text-danger small mt-1">{{ user_form.first_name.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.last_name.id_for_label }}">Last name</label>
+                                {{ user_form.last_name }}
+                                {% if user_form.last_name.errors %}<div class="text-danger small mt-1">{{ user_form.last_name.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.username.id_for_label }}">Username</label>
+                                {{ user_form.username }}
+                                {% if user_form.username.errors %}<div class="text-danger small mt-1">{{ user_form.username.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.lang.id_for_label }}">Language</label>
+                                {{ user_form.lang }}
+                                {% if user_form.lang.errors %}<div class="text-danger small mt-1">{{ user_form.lang.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small" for="{{ user_form.bio.id_for_label }}">Bio</label>
+                                {{ user_form.bio }}
+                                {% if user_form.bio.errors %}<div class="text-danger small mt-1">{{ user_form.bio.errors|join:", " }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact & Location -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-geo-alt text-primary me-2"></i>Contact & Location</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.phone.id_for_label }}">Phone</label>
+                                {{ user_form.phone }}
+                                {% if user_form.phone.errors %}<div class="text-danger small mt-1">{{ user_form.phone.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.city.id_for_label }}">City</label>
+                                {{ user_form.city }}
+                                {% if user_form.city.errors %}<div class="text-danger small mt-1">{{ user_form.city.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.country.id_for_label }}">Country <span class="text-muted fw-normal">(2-letter code)</span></label>
+                                {{ user_form.country }}
+                                {% if user_form.country.errors %}<div class="text-danger small mt-1">{{ user_form.country.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.timezone.id_for_label }}">Timezone</label>
+                                {{ user_form.timezone }}
+                                {% if user_form.timezone.errors %}<div class="text-danger small mt-1">{{ user_form.timezone.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small" for="{{ user_form.url.id_for_label }}">Website URL</label>
+                                {{ user_form.url }}
+                                {% if user_form.url.errors %}<div class="text-danger small mt-1">{{ user_form.url.errors|join:", " }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Institution -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-building text-primary me-2"></i>Institution</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.institution.id_for_label }}">Institution</label>
+                                {{ user_form.institution }}
+                                {% if user_form.institution.errors %}<div class="text-danger small mt-1">{{ user_form.institution.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ user_form.department.id_for_label }}">Department</label>
+                                {{ user_form.department }}
+                                {% if user_form.department.errors %}<div class="text-danger small mt-1">{{ user_form.department.errors|join:", " }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social & Interests -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-share text-primary me-2"></i>Social & Interests</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ profile_form.linkedin.id_for_label }}">LinkedIn URL</label>
+                                {{ profile_form.linkedin }}
+                                {% if profile_form.linkedin.errors %}<div class="text-danger small mt-1">{{ profile_form.linkedin.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ profile_form.twitter.id_for_label }}">Twitter / X handle</label>
+                                {{ profile_form.twitter }}
+                                {% if profile_form.twitter.errors %}<div class="text-danger small mt-1">{{ profile_form.twitter.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ profile_form.website.id_for_label }}">Personal Website</label>
+                                {{ profile_form.website }}
+                                {% if profile_form.website.errors %}<div class="text-danger small mt-1">{{ profile_form.website.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ profile_form.skype.id_for_label }}">Skype</label>
+                                {{ profile_form.skype }}
+                                {% if profile_form.skype.errors %}<div class="text-danger small mt-1">{{ profile_form.skype.errors|join:", " }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small" for="{{ profile_form.interests.id_for_label }}">Interests</label>
+                                {{ profile_form.interests }}
+                                {% if profile_form.interests.errors %}<div class="text-danger small mt-1">{{ profile_form.interests.errors|join:", " }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'users:profile' pk=request.user.pk %}" class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-check-lg me-1"></i>Save Changes
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Apply Bootstrap classes to bare form widgets
+    document.querySelectorAll('#editProfileForm .card-body input:not([type=file]):not([type=checkbox]):not([type=radio]), #editProfileForm .card-body select, #editProfileForm .card-body textarea').forEach(el => {
+        if (!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
+            el.classList.add(el.tagName === 'SELECT' ? 'form-select' : 'form-control');
+        }
+    });
+
+    // Live avatar preview
+    const avatarInput = document.querySelector('input[type=file][name=avatar]');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const preview = document.getElementById('avatarPreview');
+                const fallback = document.getElementById('avatarFallback');
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                if (fallback) fallback.classList.add('d-none');
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+{% endblock %}

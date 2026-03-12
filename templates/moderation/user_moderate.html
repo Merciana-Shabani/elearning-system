@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Moderate User — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <h2 class="page-title mb-0"><i class="bi bi-person-x me-2"></i>Moderate user</h2>
+            <a class="btn btn-outline-secondary" href="{% url 'users:profile' pk=target_user.pk %}">View profile</a>
+        </div>
+
+        <div class="card mb-4">
+        <div class="card-body p-4">
+            <div class="fw-semibold">{{ target_user.get_full_name|default:target_user.username }}</div>
+            <div class="text-muted small">{{ target_user.email }}</div>
+            <div class="mt-2">
+                {% if target_user.is_active %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-danger">Banned (inactive)</span>
+                    <form method="post" class="d-inline ms-2" onsubmit="return confirm('Reactivate this account?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="reactivate" value="1">
+                        <button type="submit" class="btn btn-sm btn-success">Reactivate account</button>
+                    </form>
+                {% endif %}
+                {% if target_user.is_suspended %}
+                    <span class="badge bg-warning text-dark">Suspended</span>
+                {% endif %}
+                <span class="badge bg-light text-dark border">Role: {{ target_user.get_role_display }}</span>
+            </div>
+            <div class="mt-3 pt-3 border-top">
+                <h6 class="fw-bold mb-2">Change role</h6>
+                <p class="text-muted small mb-2">Instructor = can create/manage courses only. Moderator/Admin = moderation access; check "Also instructor" to let them create courses too.</p>
+                <form method="post" class="mt-2" id="role-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="role_form" value="1">
+                    <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                        <select name="new_role" id="id_new_role" class="form-select form-select-sm" style="max-width:180px;">
+                            <option value="student" {% if target_user.role == 'student' %}selected{% endif %}>Student</option>
+                            <option value="teacher" {% if target_user.role == 'teacher' %}selected{% endif %}>Instructor</option>
+                            <option value="moderator" {% if target_user.role == 'moderator' %}selected{% endif %}>Moderator</option>
+                            <option value="admin" {% if target_user.role == 'admin' %}selected{% endif %}>Administrator</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Update role</button>
+                    </div>
+                    <div id="can-teach-wrap" class="form-check {% if target_user.role != 'moderator' and target_user.role != 'admin' %}d-none{% endif %}">
+                        <input type="checkbox" name="can_teach" id="id_can_teach" class="form-check-input" {% if target_user.can_teach %}checked{% endif %}>
+                        <label class="form-check-label small" for="id_can_teach">Also instructor (can create and manage courses)</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+        <script>
+            document.getElementById('id_new_role').addEventListener('change', function() {
+                var wrap = document.getElementById('can-teach-wrap');
+                var v = this.value;
+                if (v === 'moderator' || v === 'admin') { wrap.classList.remove('d-none'); }
+                else { wrap.classList.add('d-none'); }
+            });
+        </script>
+
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                    <h5 class="fw-bold mb-0">Issue action</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Action</label>
+                            {{ form.action_type }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Reason <span class="text-danger">*</span></label>
+                            {{ form.reason }}
+                            {% if form.reason.errors %}
+                                <div class="text-danger small mt-1">{{ form.reason.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Suspend days (only for suspensions)</label>
+                            {{ form.suspend_days }}
+                            {% if form.suspend_days.errors %}
+                                <div class="text-danger small mt-1">{{ form.suspend_days.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-outline-secondary" type="submit">Apply</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="fw-bold mb-0">Recent actions</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for a in actions %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div class="fw-semibold text-capitalize">{{ a.action_type }}</div>
+                                <div class="text-muted small">{{ a.created_at|date:"M d, Y H:i" }}</div>
+                            </div>
+                            <div class="text-muted small">By {{ a.moderator.get_full_name|default:a.moderator.username }}</div>
+                            {% if a.expires_at %}
+                            <div class="text-muted small">Expires {{ a.expires_at|date:"M d, Y H:i" }}</div>
+                            {% endif %}
+                            <div class="mt-2">{{ a.reason }}</div>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-muted text-center py-4">No actions yet.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

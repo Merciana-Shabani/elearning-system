@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Edit question{% else %}Add question{% endif %} — {{ quiz.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'quizzes:list' %}">Quizzes</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'quizzes:detail' pk=quiz.pk %}">{{ quiz.name }}</a></li>
+            <li class="breadcrumb-item active">{% if object %}Edit question{% else %}Add question{% endif %}</li>
+        </ol>
+    </nav>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h4 class="card-title mb-4">{% if object %}Edit question{% else %}Add question to quiz{% endif %}</h4>
+            <form method="post">
+                {% csrf_token %}
+                {% crispy form %}
+            </form>
+            <p class="text-muted small mt-2">After saving, add answer options and set which one(s) are correct (fraction = 1) so the quiz can be marked automatically.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

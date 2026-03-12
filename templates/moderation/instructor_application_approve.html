@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Approve Application — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <h2 class="page-title">Approve instructor application</h2>
+        <p class="text-muted mb-3"><strong>{{ application.user.get_full_name|default:application.user.email }}</strong></p>
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Optional note</label>
+                        <textarea class="form-control" name="decision_reason" rows="4" placeholder="Optional note to record..."></textarea>
+                    </div>
+                    <button class="btn btn-outline-secondary" type="submit">Approve</button>
+                    <a class="btn btn-outline-secondary" href="{% url 'moderation:instructor_applications' %}">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

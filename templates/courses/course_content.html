@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.fullname }} - Content{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% if course.category %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:list' %}">Courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:detail' pk=course.pk %}">{{ course.shortname }}</a></li>
+            <li class="breadcrumb-item active">Content</li>
+        </ol>
+    </nav>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2 class="fw-bold mb-0"><i class="bi bi-book me-2 text-primary"></i>{{ course.fullname }}</h2>
+        <div class="d-flex align-items-center gap-2">
+            {% if is_teacher %}
+            <a href="{% url 'courses:page_add' pk=course.pk %}" class="btn btn-success btn-sm">
+                <i class="bi bi-file-text me-1"></i>Add page
+            </a>
+            <a href="{% url 'courses:file_add' pk=course.pk %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-file-earmark-arrow-up me-1"></i>Add file
+            </a>
+            {% endif %}
+            <a href="{% url 'courses:detail' pk=course.pk %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Course info
+            </a>
+        </div>
+    </div>
+
+    <!-- Learning materials: lecture notes and downloadable files -->
+    {% if pages or files or is_teacher %}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="fw-bold mb-0"><i class="bi bi-journal-text me-2 text-success"></i>Learning materials</h5>
+                <p class="text-muted small mb-0 mt-1">Lecture notes and files you can view or download.</p>
+            </div>
+            {% if is_teacher %}
+            <div class="d-flex gap-2">
+                <a href="{% url 'courses:page_add' pk=course.pk %}" class="btn btn-outline-success btn-sm">Add page</a>
+                <a href="{% url 'courses:file_add' pk=course.pk %}" class="btn btn-outline-primary btn-sm">Add file</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+                {% for page in pages %}
+                <div class="list-group-item d-flex align-items-center gap-3 py-3">
+                    <i class="bi bi-file-text text-success fs-4"></i>
+                    <div class="flex-grow-1 min-width-0">
+                        <div class="fw-medium text-dark">{{ page.name }}</div>
+                        {% if page.intro %}<small class="text-muted d-block">{{ page.intro|truncatewords:15 }}</small>{% endif %}
+                    </div>
+                    <div class="btn-group btn-group-sm flex-shrink-0">
+                        <a href="{% url 'courses:view_page' pk=course.pk page_pk=page.pk %}" class="btn btn-success" title="View lecture notes">
+                            <i class="bi bi-eye me-1"></i>View
+                        </a>
+                        {% if is_teacher %}
+                        <a href="{% url 'courses:page_edit' pk=course.pk page_pk=page.pk %}" class="btn btn-outline-secondary">Edit</a>
+                        <a href="{% url 'courses:page_delete' pk=course.pk page_pk=page.pk %}" class="btn btn-outline-danger">Delete</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% for file in files %}
+                <div class="list-group-item d-flex align-items-center gap-3 py-3">
+                    <i class="bi bi-file-earmark text-primary fs-4"></i>
+                    <div class="flex-grow-1 min-width-0">
+                        <div class="fw-medium text-dark">{{ file.name }}</div>
+                        {% if file.description %}<small class="text-muted d-block">{{ file.description|truncatewords:15 }}</small>{% endif %}
+                    </div>
+                    <div class="btn-group btn-group-sm flex-shrink-0">
+                        <a href="{% url 'courses:download_file' pk=course.pk file_pk=file.pk %}?view=1" class="btn btn-outline-primary" target="_blank" rel="noopener" title="Open in browser (e.g. PDF, image)">
+                            <i class="bi bi-eye me-1"></i>View
+                        </a>
+                        <a href="{% url 'courses:download_file' pk=course.pk file_pk=file.pk %}" class="btn btn-primary" download title="Download file">
+                            <i class="bi bi-download me-1"></i>Download
+                        </a>
+                        {% if is_teacher %}
+                        <a href="{% url 'courses:file_edit' pk=course.pk file_pk=file.pk %}" class="btn btn-outline-secondary">Edit</a>
+                        <a href="{% url 'courses:file_delete' pk=course.pk file_pk=file.pk %}" class="btn btn-outline-danger">Delete</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if sections %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="fw-bold mb-0"><i class="bi bi-list-ul me-2"></i>Course sections &amp; modules</h5>
+            {% if is_teacher %}
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'assignments:create' course_pk=course.pk %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-pencil-square me-1"></i>Add assignment
+                </a>
+                <a href="{% url 'quizzes:create' course_pk=course.pk %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-patch-question me-1"></i>Add quiz
+                </a>
+                <a href="{% url 'courses:section_add' pk=course.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i>Add section
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            <div class="accordion accordion-flush" id="courseSections">
+                {% for section in sections %}
+                <div class="accordion-item border-0 border-bottom">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %} py-3"
+                                type="button" data-bs-toggle="collapse"
+                                data-bs-target="#section-{{ section.pk }}"
+                                aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                            <strong>{{ section.name|default:"Section" }} {{ section.section }}</strong>
+                            {% if not section.visible %}<span class="badge bg-secondary ms-2">Hidden</span>{% endif %}
+                            <span class="ms-auto me-3 text-muted small">
+                                {{ section.modules.count }} item{{ section.modules.count|pluralize }}
+                                {% if is_teacher %}
+                                <span class="ms-2">
+                                    <a href="{% url 'courses:section_edit' pk=course.pk section_pk=section.pk %}" class="text-decoration-none" title="Edit section" onclick="event.stopPropagation();">Edit</a>
+                                    <span class="mx-1">|</span>
+                                    <a href="{% url 'courses:section_delete' pk=course.pk section_pk=section.pk %}" class="text-decoration-none text-danger" title="Delete section" onclick="event.stopPropagation();">Delete</a>
+                                    <span class="mx-1">|</span>
+                                    <a href="{% url 'courses:module_add' pk=course.pk section_pk=section.pk %}" class="text-decoration-none" title="Add module" onclick="event.stopPropagation();">Add module</a>
+                                    <span class="mx-1">|</span>
+                                    <a href="{% url 'assignments:create_in_section' course_pk=course.pk section_pk=section.pk %}" class="text-decoration-none" title="Add assignment" onclick="event.stopPropagation();">Add assignment</a>
+                                    <span class="mx-1">|</span>
+                                    <a href="{% url 'quizzes:create_in_section' course_pk=course.pk section_pk=section.pk %}" class="text-decoration-none" title="Add quiz" onclick="event.stopPropagation();">Add quiz</a>
+                                </span>
+                                {% endif %}
+                            </span>
+                        </button>
+                    </h2>
+                    <div id="section-{{ section.pk }}"
+                         class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                         data-bs-parent="#courseSections">
+                        <div class="accordion-body p-0">
+                            {% for module in section.modules.all %}
+                            {% if module.visible or is_teacher %}
+                            {% if is_teacher or module.module_type != 'quiz' or module.instance_id in open_quiz_ids %}
+                            <div class="d-flex align-items-center p-3 border-bottom hover-bg-light" style="margin-left: {{ module.indent|default:0 }}em;">
+                                <i class="bi bi-{% if module.module_type == 'quiz' %}question-circle{% elif module.module_type == 'assignment' %}pencil-square{% elif module.module_type == 'forum' %}chat-dots{% elif module.module_type == 'video' %}play-circle{% elif module.module_type == 'file' %}file-earmark{% elif module.module_type == 'url' %}link-45deg{% elif module.module_type == 'page' %}file-text{% elif module.module_type == 'label' %}card-text{% else %}circle{% endif %} text-primary me-3 fs-5"></i>
+                                <div class="flex-grow-1">
+                                    <span class="fw-medium">{{ module.name }}</span>
+                                    {% if not module.visible %}<span class="badge bg-secondary ms-2">Hidden</span>{% endif %}
+                                    <span class="badge bg-light text-dark ms-2">{{ module.get_module_type_display }}</span>
+                                </div>
+                                {% if is_teacher %}
+                                <div class="btn-group btn-group-sm">
+                                    {% if module.instance_id %}
+                                        {% if module.module_type == 'assignment' %}
+                                        <a href="{% url 'assignments:detail' pk=module.instance_id %}" class="btn btn-outline-primary">Open</a>
+                                        {% elif module.module_type == 'quiz' %}
+                                        <a href="{% url 'quizzes:detail' pk=module.instance_id %}" class="btn btn-outline-primary">Open</a>
+                                        {% elif module.module_type == 'page' %}
+                                        <a href="{% url 'courses:view_page' pk=course.pk page_pk=module.instance_id %}" class="btn btn-outline-primary">Open</a>
+                                        {% elif module.module_type == 'file' %}
+                                        <a href="{% url 'courses:download_file' pk=course.pk file_pk=module.instance_id %}" class="btn btn-outline-primary">Open</a>
+                                        {% endif %}
+                                    {% endif %}
+                                    <a href="{% url 'courses:module_edit' pk=course.pk module_pk=module.pk %}" class="btn btn-outline-secondary">Edit</a>
+                                    <a href="{% url 'courses:module_delete' pk=course.pk module_pk=module.pk %}" class="btn btn-outline-danger">Delete</a>
+                                </div>
+                                {% elif module.instance_id %}
+                                    {% if module.module_type == 'assignment' %}
+                                    <a href="{% url 'assignments:detail' pk=module.instance_id %}" class="btn btn-sm btn-outline-primary">Open</a>
+                                    {% elif module.module_type == 'quiz' %}
+                                    <a href="{% url 'quizzes:detail' pk=module.instance_id %}" class="btn btn-sm btn-outline-primary">Open</a>
+                                    {% elif module.module_type == 'forum' %}
+                                    <a href="{% url 'forums:detail' pk=module.instance_id %}" class="btn btn-sm btn-outline-primary">Open</a>
+                                    {% elif module.module_type == 'page' %}
+                                    <a href="{% url 'courses:view_page' pk=course.pk page_pk=module.instance_id %}" class="btn btn-sm btn-outline-success">View notes</a>
+                                    {% elif module.module_type == 'file' %}
+                                    <a href="{% url 'courses:download_file' pk=course.pk file_pk=module.instance_id %}" class="btn btn-sm btn-outline-primary">Download</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                            {% empty %}
+                            <div class="p-3 text-muted small">
+                                No items in this section.
+                                {% if is_teacher %}
+                                <a href="{% url 'courses:module_add' pk=course.pk section_pk=section.pk %}">Add module</a>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm border-primary" style="border-width: 2px !important;">
+        <div class="card-body text-center py-5 px-4">
+            <i class="bi bi-journal-text text-primary" style="font-size:4rem;"></i>
+            <h5 class="mt-3 fw-bold text-dark">No sections yet</h5>
+            <p class="mb-0 mt-2 fs-6 text-dark" style="max-width: 32rem; margin-left: auto; margin-right: auto;">
+                This course doesn't have any sections or modules yet. Add a section to organize content.
+            </p>
+            {% if is_teacher %}
+            <a href="{% url 'courses:section_add' pk=course.pk %}" class="btn btn-primary mt-4">
+                <i class="bi bi-plus-lg me-1"></i>Add first section
+            </a>
+            {% endif %}
+            <a href="{% url 'users:user_dashboard' pk=request.user.pk %}" class="btn btn-outline-secondary mt-4 ms-2">Back to my dashboard</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.hover-bg-light:hover { background-color: rgba(0,0,0,.02); }
+</style>
+{% endblock %}

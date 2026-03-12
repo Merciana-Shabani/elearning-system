@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Announcements — {{ course.fullname }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:teaching' %}">My courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:detail' pk=course.pk %}">{{ course.shortname }}</a></li>
+            <li class="breadcrumb-item active">Announcements</li>
+        </ol>
+    </nav>
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <h2 class="fw-bold mb-0">Announcements</h2>
+        {% if is_teacher %}
+        <a href="{% url 'courses:announcement_add' pk=course.pk %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Post announcement
+        </a>
+        {% endif %}
+    </div>
+
+    {% if announcements %}
+    <div class="list-group">
+        {% for a in announcements %}
+        <div class="list-group-item">
+            <h6 class="mb-1">{{ a.title }}</h6>
+            <p class="mb-1 text-muted small">By {{ a.author.get_full_name|default:a.author.email }} — {{ a.created_at|date:"M d, Y H:i" }}</p>
+            <p class="mb-0">{{ a.body|linebreaks }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No announcements yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

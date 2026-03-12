@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Categories — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <h2 class="page-title mb-0"><i class="bi bi-tags me-2"></i>Manage Categories</h2>
+            <a class="btn btn-outline-secondary" href="{% url 'courses:category_create' %}">
+                <i class="bi bi-plus-lg me-1"></i>Create category
+            </a>
+        </div>
+
+        <form class="row g-2 mb-3" method="get">
+            <div class="col-sm-8 col-md-6">
+                <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search categories...">
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </form>
+
+        <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Parent</th>
+                        <th>Visible</th>
+                        <th>Sort</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in categories %}
+                    <tr>
+                        <td class="fw-semibold">{{ c.name }}</td>
+                        <td class="text-muted">{{ c.parent.name|default:"—" }}</td>
+                        <td>
+                            {% if c.visible %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ c.sortorder }}</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" href="{% url 'courses:category_edit' pk=c.pk %}">Rename / Edit</a>
+                            {% if c.visible %}
+                            <a class="btn btn-sm btn-outline-danger" href="{% url 'courses:category_deactivate' pk=c.pk %}">Deactivate</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">No categories found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz result — {{ attempt.quiz.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+        <div class="min-width-0">
+            <h2 class="fw-bold mb-1"><i class="bi bi-check-circle me-2 text-success"></i>Quiz result</h2>
+            <div class="text-muted">
+                {{ attempt.quiz.name }} · {{ attempt.quiz.course.fullname }}
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'quizzes:detail' pk=attempt.quiz.pk %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to quiz
+            </a>
+            <a href="{% url 'courses:content' pk=attempt.quiz.course.pk %}" class="btn btn-outline-primary">
+                <i class="bi bi-book me-1"></i>Course content
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="text-muted small">Score</div>
+                    <div class="fw-bold fs-3">
+                        {% if attempt.quiz.grade and attempt.sumgrades is not None %}
+                            {{ attempt.score_percentage }}%
+                        {% else %}
+                            —
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Completed</div>
+                    <div class="fw-semibold">
+                        {% if attempt.time_finish %}{{ attempt.time_finish|date:"M d, Y H:i" }}{% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Status</div>
+                    <div class="fw-semibold text-capitalize">{{ attempt.state }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+            <h6 class="fw-bold mb-0">Your answers</h6>
+        </div>
+        <div class="card-body p-4">
+            {% for q in questions %}
+            <div class="mb-4">
+                <div class="fw-semibold mb-2">Q{{ forloop.counter }}. {{ q.name }}</div>
+                <div class="rich-content mb-2">{{ q.question_text|safe }}</div>
+
+                {% with r=responses|get_item:q.pk %}
+                    {% if r %}
+                        {% if q.question_type == 'essay' or q.question_type == 'shortanswer' %}
+                            <div class="border rounded p-3 bg-light">{{ r.text_response|default:"(no answer)" }}</div>
+                        {% else %}
+                            <ul class="mb-0">
+                                {% for a in r.selected_answers.all %}
+                                <li>{{ a.answer_text }}</li>
+                                {% empty %}
+                                <li class="text-muted">(no answer)</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-muted">(no response)</div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+            {% empty %}
+            <p class="text-muted mb-0">No questions found for this quiz.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Export reports — {{ course.shortname }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:teaching' %}">My courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:detail' pk=course.pk %}">{{ course.shortname }}</a></li>
+            <li class="breadcrumb-item active">Export reports</li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold mb-4">Export reports</h2>
+    <p class="text-muted">Download enrolment and activity data.</p>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'courses:export_reports' pk=course.pk %}?format=csv" class="btn btn-outline-primary">
+            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Download enrolment report (CSV)
+        </a>
+        <a href="{% url 'courses:export_reports' pk=course.pk %}?format=pdf" class="btn btn-outline-danger">
+            <i class="bi bi-file-earmark-pdf me-2"></i>Download enrolment report (PDF)
+        </a>
+    </div>
+</div>
+{% endblock %}

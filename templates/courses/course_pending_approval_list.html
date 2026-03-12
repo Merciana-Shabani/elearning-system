@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses Pending Approval — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <h2 class="page-title"><i class="bi bi-check2-square me-2"></i>Courses Pending Approval</h2>
+        {% if courses %}
+        <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Course</th>
+                        <th>Instructor</th>
+                        <th>Submitted</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td class="fw-semibold">{{ course.fullname }} <span class="text-muted">({{ course.shortname }})</span></td>
+                        <td>{{ course.teacher.get_full_name|default:course.teacher.email }}</td>
+                        <td>{{ course.submitted_at|date:"M d, Y H:i" }}</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-success me-1" href="{% url 'courses:approve' pk=course.pk %}">Approve</a>
+                            <a class="btn btn-sm btn-outline-warning me-1" href="{% url 'courses:return_for_revision' pk=course.pk %}">Return</a>
+                            <a class="btn btn-sm btn-outline-danger" href="{% url 'courses:reject' pk=course.pk %}">Reject</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </div>
+        {% else %}
+        <p class="text-muted">No courses pending approval.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

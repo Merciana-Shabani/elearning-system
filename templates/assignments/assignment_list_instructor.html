@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Assignments — My courses{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-pencil-square me-2 text-primary"></i>Assignments</h2>
+            <p class="text-muted mb-0">Assignments in courses you teach.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-plus-lg me-1"></i>Create assignment
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    {% for c in my_courses %}
+                    <li>
+                        <a class="dropdown-item" href="{% url 'assignments:create' course_pk=c.pk %}">
+                            {{ c.fullname }}
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li><span class="dropdown-item-text text-muted">No courses yet</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <a href="{% url 'courses:teaching' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-book me-1"></i>My courses
+            </a>
+        </div>
+    </div>
+
+    {% if assignments %}
+    <div class="card border-0 shadow-sm">
+        <div class="list-group list-group-flush">
+            {% for a in assignments %}
+            <a href="{% url 'assignments:detail' pk=a.pk %}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+                <div class="min-width-0">
+                    <div class="fw-semibold text-truncate">{{ a.name }}</div>
+                    <div class="text-muted small text-truncate">
+                        <i class="bi bi-book me-1"></i>{{ a.course.shortname }} — {{ a.course.fullname }}
+                        {% if a.due_date %} · due {{ a.due_date|date:"M d, Y" }}{% endif %}
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="mt-3" aria-label="Assignments pagination">
+        <ul class="pagination justify-content-center mb-0">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-pencil-square text-muted" style="font-size:3rem;"></i>
+        <h5 class="mt-3">No assignments yet</h5>
+        <p class="text-muted">Create an assignment in one of your courses to see it here.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

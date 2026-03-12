@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics — {{ course.shortname }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:teaching' %}">My courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:detail' pk=course.pk %}">{{ course.shortname }}</a></li>
+            <li class="breadcrumb-item active">Analytics</li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold mb-4">Course analytics: {{ course.fullname }}</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Enrolled students</h6>
+                    <h3 class="mb-0">{{ enrollments }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5 class="mb-3">Per-module engagement (completions)</h5>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Module</th>
+                        <th>Section</th>
+                        <th class="text-end">Completed by</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mod, count in module_completion_list %}
+                    <tr>
+                        <td>{{ mod.name }}</td>
+                        <td>{{ mod.section.name|default:mod.section.section }}</td>
+                        <td class="text-end">{{ count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-muted">No modules yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p class="text-muted small">Completion counts are based on learners who completed each module (e.g. viewed a page or file with completion on view).</p>
+
+    {% if quiz_attempts %}
+    <h5 class="mb-3">Quiz attempts & scores</h5>
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Quiz</th>
+                        <th class="text-end">Attempts</th>
+                        <th class="text-end">Unique users</th>
+                        <th class="text-end">Avg grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for qa in quiz_attempts %}
+                    <tr>
+                        <td>{{ qa.quiz__name|default:"Quiz" }}</td>
+                        <td class="text-end">{{ qa.attempts }}</td>
+                        <td class="text-end">{{ qa.users }}</td>
+                        <td class="text-end">{% if qa.avg_grade != None %}{{ qa.avg_grade|floatformat:1 }}{% else %}—{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

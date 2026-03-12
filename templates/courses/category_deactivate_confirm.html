@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Deactivate Category — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <h2 class="page-title">Deactivate category</h2>
+        <div class="card">
+            <div class="card-body p-4">
+                <p class="text-muted mb-3">This will hide <strong>{{ category.name }}</strong> from normal browsing. Courses already in the category will remain, but the category won’t be shown.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary">Deactivate</button>
+                    <a href="{% url 'courses:categories_manage' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ quiz.name }} — Quiz{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+        <div class="min-width-0">
+            <h2 class="fw-bold mb-1"><i class="bi bi-patch-question me-2 text-primary"></i>{{ quiz.name }}</h2>
+            <div class="text-muted">
+                <i class="bi bi-book me-1"></i>{{ quiz.course.fullname }}
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'courses:content' pk=quiz.course.pk %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to course
+            </a>
+            {% if is_teacher %}
+            <a href="{% url 'quizzes:list' %}" class="btn btn-outline-primary">
+                <i class="bi bi-list-ul me-1"></i>My quizzes
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <!-- Key info first (dates, time limit, attempts) -->
+                    <div class="row g-3 small">
+                        <div class="col-md-6">
+                            <div class="text-muted"><strong>Opens:</strong> {% if quiz.time_open %}{{ quiz.time_open|date:"M d, Y H:i" }}{% else %}Any time{% endif %}</div>
+                            <div class="text-muted"><strong>Closes:</strong> {% if quiz.time_close %}{{ quiz.time_close|date:"M d, Y H:i" }}{% else %}No end date{% endif %}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-muted"><strong>Time limit:</strong> {% if quiz.time_limit > 0 %}{{ quiz.time_limit }} sec{% else %}No limit{% endif %}</div>
+                            <div class="text-muted"><strong>Attempts allowed:</strong> {% if quiz.attempts_allowed == -1 %}Unlimited{% else %}{{ quiz.attempts_allowed }}{% endif %}</div>
+                        </div>
+                    </div>
+
+                    {% if quiz.intro %}
+                    <hr class="my-3">
+                    <div class="rich-content mb-3">{{ quiz.intro|safe }}</div>
+                    {% else %}
+                    <hr class="my-3">
+                    {% endif %}
+
+                    {% if is_open %}
+                        {% if can_attempt %}
+                        <a href="{% url 'quizzes:start' pk=quiz.pk %}" class="btn btn-success">
+                            <i class="bi bi-play-circle me-1"></i>Start quiz
+                        </a>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">
+                            You have used all allowed attempts for this quiz.
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-warning mb-0">
+                            This quiz is not currently open.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            {% if is_teacher %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+                    <h6 class="fw-bold mb-0">Manage questions & answers</h6>
+                    <a href="{% url 'quizzes:question_add' quiz_pk=quiz.pk %}" class="btn btn-sm btn-primary">Add question</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">Add questions and set correct answers (fraction = Correct) so the quiz is marked automatically.</p>
+                    {% if questions %}
+                    <ul class="list-group list-group-flush">
+                        {% for q in questions %}
+                        <li class="list-group-item px-0 d-flex align-items-start justify-content-between flex-wrap gap-2">
+                            <div class="small">
+                                <span class="fw-semibold">{{ q.name }}</span>
+                                <span class="badge bg-secondary ms-1">{{ q.get_question_type_display }}</span>
+                                <br><span class="text-muted">{{ q.answers.count }} answer(s)</span>
+                            </div>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'quizzes:question_edit' pk=q.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <a href="{% url 'quizzes:answer_add' question_pk=q.pk %}" class="btn btn-sm btn-outline-primary">Add answer</a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted small mb-0">No questions yet. Add a question, then add answer options and mark which are correct.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h6 class="fw-bold mb-0">My attempts</h6>
+                </div>
+                <div class="card-body">
+                    {% if attempts %}
+                    <div class="list-group list-group-flush">
+                        {% for a in attempts %}
+                        <div class="list-group-item px-0 d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="fw-semibold small">Attempt #{{ a.attempt_number }}</div>
+                                <div class="text-muted small">
+                                    {% if a.time_finish %}{{ a.time_finish|date:"M d, Y H:i" }}{% else %}In progress{% endif %}
+                                </div>
+                            </div>
+                            {% if a.state == 'finished' %}
+                            <a class="btn btn-sm btn-outline-primary" href="{% url 'quizzes:result' attempt_pk=a.pk %}">Result</a>
+                            {% elif a.state == 'inprogress' %}
+                            <a class="btn btn-sm btn-outline-secondary" href="{% url 'quizzes:attempt' attempt_pk=a.pk %}">Continue</a>
+                            {% else %}
+                            <span class="badge bg-secondary text-uppercase">{{ a.state }}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted small mb-0">No attempts yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

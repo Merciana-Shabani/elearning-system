@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}All Courses — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-collection me-2 text-primary"></i>All Courses</h2>
+            <p class="text-muted mb-0">All courses on the platform. You can manage your own; others are view-only.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'courses:teaching' %}" class="btn btn-outline-primary">
+                <i class="bi bi-person-badge me-2"></i>My courses
+            </a>
+            <a href="{% url 'courses:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Create Course
+            </a>
+        </div>
+    </div>
+
+    {% if courses %}
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Course name</th>
+                        <th>Short name</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td class="fw-semibold">{{ course.fullname }}</td>
+                        <td class="text-muted">{{ course.shortname }}</td>
+                        <td>
+                            <span class="badge {% if course.status == 'published' %}bg-success{% elif course.status == 'submitted' %}bg-info{% elif course.status == 'rejected' %}bg-danger{% elif course.status == 'needs_revision' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                {{ course.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            {% if course.teacher_id == user.pk %}
+                            <div class="btn-group btn-group-sm" role="group">
+                                {% if course.status == 'draft' or course.status == 'rejected' %}
+                                <a class="btn btn-outline-success" href="{% url 'courses:submit_for_approval' pk=course.pk %}">
+                                    Submit for approval
+                                </a>
+                                {% endif %}
+                                <a class="btn btn-outline-primary" href="{% url 'courses:content' pk=course.pk %}">Content</a>
+                                <a class="btn btn-outline-primary" href="{% url 'courses:announcements_list' pk=course.pk %}">Announcements</a>
+                                <a class="btn btn-outline-primary" href="{% url 'courses:analytics' pk=course.pk %}">Analytics</a>
+                                <a class="btn btn-outline-primary" href="{% url 'courses:certificates' pk=course.pk %}">Certificates</a>
+                                <a class="btn btn-outline-primary" href="{% url 'courses:export_reports' pk=course.pk %}">Export</a>
+                                <a class="btn btn-outline-secondary" href="{% url 'courses:edit' pk=course.pk %}">Edit</a>
+                                <a class="btn btn-outline-danger" href="{% url 'courses:delete' pk=course.pk %}">Delete</a>
+                            </div>
+                            {% else %}
+                            <a class="btn btn-outline-primary btn-sm" href="{% url 'courses:detail' pk=course.pk %}">View</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-3" aria-label="Course pagination">
+        <ul class="pagination justify-content-center mb-0">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a></li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if num == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right"></i></a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-5">
+        <p class="text-muted mb-0">No courses in the system yet.</p>
+        <a href="{% url 'courses:teaching' %}" class="btn btn-outline-primary mt-2">My courses</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

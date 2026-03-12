@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Elening LMS{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    {% load static %}
+    <link href="{% static 'css/elening.css' %}" rel="stylesheet">
+
+    <style>
+        .global-sidebar {
+            width: 230px;
+            min-width: 230px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,.2) transparent;
+        }
+        .global-sidebar::-webkit-scrollbar { width: 4px; }
+        .global-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 4px; }
+
+        .global-sidebar .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: .45rem .75rem;
+            border-radius: .375rem;
+            color: #b8cce0;
+            text-decoration: none;
+            font-size: .875rem;
+            transition: background .15s, color .15s;
+            margin-bottom: 2px;
+        }
+        .global-sidebar .sidebar-link:hover {
+            background: rgba(255,255,255,.1);
+            color: #fff;
+        }
+        .global-sidebar .sidebar-link.active {
+            background: #1e5799;
+            color: #fff;
+        }
+        .global-sidebar .sidebar-link.active i { color: inherit !important; }
+        .global-sidebar .sidebar-section-label {
+            font-size: .67rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .9px;
+            color: rgba(255,255,255,.35);
+            padding: .6rem .75rem .2rem;
+        }
+        .sidebar-avatar-initials {
+            width: 36px; height: 36px;
+            font-size: .72rem; font-weight: 700;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            background: rgba(255,255,255,.15);
+            color: #fff;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    {% include 'partials/navbar.html' %}
+
+    <!-- Main layout -->
+    <main class="flex-grow-1 d-flex align-items-stretch">
+
+        {% if user.is_authenticated %}
+        <!-- Global Persistent Sidebar -->
+        <nav id="globalSidebar" class="global-sidebar bg-white border-end d-none d-lg-flex flex-column shadow-sm flex-shrink-0">
+
+            <!-- Mini profile -->
+            <div class="p-3 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" class="rounded-circle flex-shrink-0"
+                         width="36" height="36" style="object-fit:cover;" alt="Avatar">
+                    {% else %}
+                    <div class="sidebar-avatar-initials bg-primary text-white">
+                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                    </div>
+                    {% endif %}
+                    <div style="min-width:0;">
+                        <div class="fw-semibold text-truncate" style="font-size:.83rem;max-width:155px;">
+                            {{ user.get_full_name|default:user.username }}
+                        </div>
+                        <span class="badge
+                            {% if user.is_admin_role %}bg-danger
+                            {% elif user.is_moderator %}bg-warning text-dark
+                            {% elif user.is_instructor %}bg-success
+                            {% else %}bg-primary{% endif %}"
+                            style="font-size:.62rem;">
+                            {{ user.get_role_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation links -->
+            <div class="p-2 flex-grow-1">
+
+                {% if user.is_moderator %}
+                <a href="{% url 'moderation:dashboard' %}" class="sidebar-link">
+                    <i class="bi bi-shield-check me-2"></i>Moderation Dashboard
+                </a>
+                <div class="sidebar-section-label">Queues</div>
+                <a href="{% url 'courses:pending_approval' %}" class="sidebar-link">
+                    <i class="bi bi-check2-square me-2 text-warning"></i>Pending course reviews
+                </a>
+                <a href="{% url 'moderation:reports' %}" class="sidebar-link">
+                    <i class="bi bi-flag me-2 text-warning"></i>Flagged content
+                </a>
+                <a href="{% url 'moderation:disputes' %}" class="sidebar-link">
+                    <i class="bi bi-exclamation-diamond me-2 text-warning"></i>Disputes
+                </a>
+
+                <div class="sidebar-section-label">Management</div>
+                <a href="{% url 'users:list' %}" class="sidebar-link">
+                    <i class="bi bi-people me-2"></i>Users
+                </a>
+                <a href="{% url 'courses:categories_manage' %}" class="sidebar-link">
+                    <i class="bi bi-tags me-2"></i>Course categories
+                </a>
+                <div class="sidebar-section-label">Teaching</div>
+                <a href="{% url 'courses:teaching' %}" class="sidebar-link">
+                    <i class="bi bi-book me-2"></i>Courses
+                </a>
+                <a href="{% url 'conferences:list' %}" class="sidebar-link">
+                    <i class="bi bi-camera-video me-2"></i>Live meeting
+                </a>
+                <a href="{% url 'quizzes:list' %}" class="sidebar-link">
+                    <i class="bi bi-patch-question me-2"></i>Quiz
+                </a>
+                <a href="{% url 'enrollment:study_list' %}" class="sidebar-link">
+                    <i class="bi bi-bookmark-star me-2"></i>Study list
+                </a>
+                {% if user.is_admin_role or user.is_staff %}
+                <a href="{% url 'admin:index' %}" class="sidebar-link">
+                    <i class="bi bi-shield-lock me-2 text-danger"></i>Admin Panel
+                </a>
+                {% endif %}
+
+                <div class="sidebar-section-label">Account</div>
+                <a href="{% url 'users:profile' pk=user.pk %}" class="sidebar-link">
+                    <i class="bi bi-person me-2"></i>My Profile
+                </a>
+                <a href="{% url 'users:edit_profile' %}" class="sidebar-link">
+                    <i class="bi bi-gear me-2"></i>Settings
+                </a>
+
+                {% elif user.is_instructor %}
+                <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="bi bi-grid me-2"></i>Dashboard
+                </a>
+                <a href="{% url 'courses:teaching' %}" class="sidebar-link">
+                    <i class="bi bi-book me-2"></i>Courses
+                </a>
+                <a href="{% url 'conferences:list' %}" class="sidebar-link">
+                    <i class="bi bi-camera-video me-2"></i>Live meeting
+                </a>
+                <a href="{% url 'quizzes:list' %}" class="sidebar-link">
+                    <i class="bi bi-patch-question me-2"></i>Quiz
+                </a>
+                <a href="{% url 'enrollment:study_list' %}" class="sidebar-link">
+                    <i class="bi bi-bookmark-star me-2"></i>Study list
+                </a>
+                <div class="sidebar-section-label">Account</div>
+                <a href="{% url 'users:profile' pk=user.pk %}" class="sidebar-link">
+                    <i class="bi bi-person me-2"></i>Profile
+                </a>
+                <a href="{% url 'users:edit_profile' %}" class="sidebar-link">
+                    <i class="bi bi-gear me-2"></i>Settings
+                </a>
+
+                {% else %}
+                <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="bi bi-grid me-2"></i>Dashboard
+                </a>
+                <a href="{% url 'enrollment:my_courses' %}" class="sidebar-link">
+                    <i class="bi bi-collection me-2"></i>My courses
+                </a>
+                <a href="{% url 'courses:list' %}" class="sidebar-link">
+                    <i class="bi bi-book me-2"></i>Course catalog
+                </a>
+                <a href="{% url 'conferences:list' %}" class="sidebar-link">
+                    <i class="bi bi-camera-video me-2"></i>Live Briefings
+                </a>
+                <a href="{% url 'messaging:inbox' %}" class="sidebar-link">
+                    <i class="bi bi-envelope me-2"></i>Messages
+                </a>
+                <div class="sidebar-section-label">Account</div>
+                <a href="{% url 'users:profile' pk=user.pk %}" class="sidebar-link">
+                    <i class="bi bi-person me-2"></i>My Profile
+                </a>
+                <a href="{% url 'users:edit_profile' %}" class="sidebar-link">
+                    <i class="bi bi-gear me-2"></i>Settings
+                </a>
+                {% endif %}
+
+            </div>
+
+            <!-- Sign out at the bottom -->
+            <div class="p-2 border-top">
+                <form method="post" action="{% url 'account_logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="sidebar-link w-100 border-0 bg-transparent text-danger text-start">
+                        <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+                    </button>
+                </form>
+            </div>
+        </nav>
+        {% endif %}
+
+        <!-- Page content (white background matches sidebar height) -->
+        <div class="main-content-wrap flex-grow-1 overflow-auto">
+
+            {% if messages %}
+            <div class="{% if user.is_authenticated %}px-3 px-lg-4{% else %}container{% endif %} mt-3">
+                {% for message in messages %}
+                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    {% include 'partials/footer.html' %}
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/elening.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

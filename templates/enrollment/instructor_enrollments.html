@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Enrollments — My courses{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-people me-2 text-primary"></i>Enrollments</h2>
+            <p class="text-muted mb-0">Active enrollments across courses you teach.</p>
+        </div>
+        <a href="{% url 'courses:teaching' %}" class="btn btn-outline-primary">
+            <i class="bi bi-book me-1"></i>My courses
+        </a>
+    </div>
+
+    {% if enrollments %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">Student</th>
+                            <th class="border-0">Course</th>
+                            <th class="border-0">Enrolled</th>
+                            <th class="border-0 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in enrollments %}
+                        <tr>
+                            <td>
+                                <span class="fw-semibold">{{ e.user.get_full_name|default:e.user.username }}</span>
+                                <div class="text-muted small">{{ e.user.username }}</div>
+                            </td>
+                            <td class="text-muted">{{ e.course.fullname }}</td>
+                            <td>{{ e.enrolled_at|date:"M d, Y" }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'courses:content' pk=e.course.pk %}" class="btn btn-sm btn-outline-primary">
+                                    View course
+                                </a>
+                                <a href="{% url 'users:profile' pk=e.user.pk %}" class="btn btn-sm btn-outline-secondary">
+                                    View student
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="mt-3" aria-label="Enrollments pagination">
+        <ul class="pagination justify-content-center mb-0">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-people text-muted" style="font-size:3rem;"></i>
+        <h5 class="mt-3">No enrollments yet</h5>
+        <p class="text-muted">Once learners enroll in your courses, they will appear here.</p>
+        <a href="{% url 'courses:teaching' %}" class="btn btn-primary">
+            My courses
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

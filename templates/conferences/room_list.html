@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Live training sessions — TPF Training Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h4 class="fw-bold mb-0"><i class="bi bi-camera-video-fill text-primary me-2"></i>Live Sessions</h4>
+            <p class="text-muted small mb-0">{% if user.can_manage_live_sessions %}Create and host live training sessions{% else %}View scheduled sessions and attend live training{% endif %}</p>
+        </div>
+        {% if user.can_manage_live_sessions %}
+        <a href="{% url 'conferences:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>New Session
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Live Now -->
+    {% if active_rooms %}
+    <div class="mb-4">
+        <h6 class="fw-bold text-uppercase text-muted small mb-3">
+            <span class="badge bg-danger me-2" style="font-size:.65rem;">LIVE</span>Happening Now
+        </h6>
+        <div class="row g-3">
+            {% for room in active_rooms %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100 border-start border-danger border-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between mb-2">
+                            <span class="badge bg-danger">
+                                <i class="bi bi-circle-fill me-1" style="font-size:.5rem;vertical-align:middle;"></i>LIVE
+                            </span>
+                            {% if room.course %}
+                            <span class="badge bg-light text-dark border small">{{ room.course.shortname }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small mb-2">
+                            <i class="bi bi-clock me-1"></i>{{ room.duration_minutes }} min
+                        </div>
+                        <h6 class="fw-bold mb-1">{{ room.title }}</h6>
+                        {% if room.description %}
+                        <p class="text-muted small mb-2 text-truncate">{{ room.description }}</p>
+                        {% endif %}
+                        <div class="text-muted small mb-3">
+                            <i class="bi bi-person me-1"></i>{{ room.host.get_full_name|default:room.host.username }}
+                        </div>
+                        <a href="{{ room.get_absolute_url }}" class="btn btn-danger btn-sm w-100">
+                            <i class="bi bi-camera-video me-1"></i>Join Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Upcoming -->
+    {% if upcoming_rooms %}
+    <div class="mb-4">
+        <h6 class="fw-bold text-uppercase text-muted small mb-3">
+            <i class="bi bi-calendar-event me-1"></i>Upcoming
+        </h6>
+        <div class="card border-0 shadow-sm">
+            <div class="list-group list-group-flush">
+                {% for room in upcoming_rooms %}
+                <div class="list-group-item d-flex align-items-center gap-3 py-3">
+                    <div class="bg-primary bg-opacity-10 rounded p-2 flex-shrink-0 text-center" style="min-width:52px;">
+                        <div class="text-primary fw-bold" style="font-size:.75rem;">{{ room.scheduled_at|date:"M" }}</div>
+                        <div class="text-primary fw-bold fs-5 lh-1">{{ room.scheduled_at|date:"d" }}</div>
+                    </div>
+                    <div class="flex-grow-1 min-width-0">
+                        <div class="fw-semibold text-truncate">{{ room.title }}</div>
+                        <div class="text-muted small">
+                            <i class="bi bi-clock me-1"></i>{{ room.scheduled_at|date:"H:i" }}
+                            {% if room.duration_minutes %}({{ room.duration_minutes }} min){% endif %}
+                            &nbsp;&bull;&nbsp;
+                            <i class="bi bi-person me-1"></i>{{ room.host.get_full_name|default:room.host.username }}
+                            {% if room.course %}
+                            &nbsp;&bull;&nbsp;<i class="bi bi-book me-1"></i>{{ room.course.shortname }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{{ room.get_absolute_url }}" class="btn btn-outline-primary btn-sm flex-shrink-0">
+                        View
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- All Rooms -->
+    <h6 class="fw-bold text-uppercase text-muted small mb-3">All Sessions</h6>
+
+    {% if rooms %}
+    <div class="card border-0 shadow-sm">
+        <div class="list-group list-group-flush">
+            {% for room in rooms %}
+            <div class="list-group-item d-flex align-items-center gap-3 py-3">
+
+                <!-- Icon -->
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0
+                    {% if room.is_active %}bg-danger{% elif room.is_ended %}bg-secondary{% else %}bg-primary{% endif %}
+                    bg-opacity-15"
+                     style="width:44px;height:44px;">
+                    <i class="bi bi-camera-video
+                        {% if room.is_active %}text-danger{% elif room.is_ended %}text-secondary{% else %}text-primary{% endif %}"
+                       style="font-size:1.1rem;"></i>
+                </div>
+
+                <!-- Info -->
+                <div class="flex-grow-1 min-width-0">
+                    <div class="fw-semibold text-truncate">{{ room.title }}</div>
+                    <div class="text-muted small">
+                        <i class="bi bi-person me-1"></i>{{ room.host.get_full_name|default:room.host.username }}
+                        {% if room.course %}
+                        &nbsp;&bull;&nbsp;<i class="bi bi-book me-1"></i>{{ room.course.shortname }}
+                        {% endif %}
+                        &nbsp;&bull;&nbsp;
+                        {% if room.is_active %}
+                            <span class="text-danger fw-semibold">Live now</span>
+                        {% elif room.is_ended %}
+                            Ended {{ room.ended_at|date:"M d, H:i" }}
+                        {% elif room.scheduled_at %}
+                            Scheduled {{ room.scheduled_at|date:"M d, H:i" }}
+                        {% else %}
+                            Created {{ room.created_at|date:"M d" }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Status badge -->
+                <div class="flex-shrink-0 d-flex align-items-center gap-2">
+                    {% if room.require_password %}
+                    <i class="bi bi-lock text-muted" title="Password protected"></i>
+                    {% endif %}
+                    {% if room.is_active %}
+                        <a href="{{ room.get_absolute_url }}" class="btn btn-danger btn-sm">
+                            <i class="bi bi-camera-video me-1"></i>Join
+                        </a>
+                    {% elif not room.is_ended %}
+                        <a href="{{ room.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                            View
+                        </a>
+                    {% else %}
+                        <span class="badge bg-secondary">Ended</span>
+                    {% endif %}
+                    {% if room.host == request.user %}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if not room.is_ended %}
+                            <li>
+                                <form action="{% url 'conferences:end' slug=room.room_slug %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-warning">
+                                        <i class="bi bi-stop-circle me-2"></i>End Session
+                                    </button>
+                                </form>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <form action="{% url 'conferences:delete' slug=room.room_slug %}" method="post"
+                                      onsubmit="return confirm('Delete this room?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-trash me-2"></i>Delete
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav class="mt-3">
+        <ul class="pagination pagination-sm justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-camera-video-off text-muted" style="font-size:3rem;"></i>
+            <p class="text-muted mt-2 mb-3">No sessions yet.{% if user.can_manage_live_sessions %} Create one to get started.{% else %} Check back later for live briefings.{% endif %}</p>
+            {% if user.can_manage_live_sessions %}
+            <a href="{% url 'conferences:create' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i>Create the first one
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

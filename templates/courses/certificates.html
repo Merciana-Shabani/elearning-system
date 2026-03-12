@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificates — {{ course.shortname }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:teaching' %}">My courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:detail' pk=course.pk %}">{{ course.shortname }}</a></li>
+            <li class="breadcrumb-item active">Certificates</li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold mb-4">Issue certificates</h2>
+    <p class="text-muted">Students who have completed the course (completion status set) can be issued a certificate. You can manually issue a certificate to any qualifying student below.</p>
+
+    <h5 class="mt-4 mb-3">Qualifying students (course completed, not yet certified)</h5>
+    {% if qualifying %}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in qualifying %}
+                    <tr>
+                        <td>{{ e.user.get_full_name|default:e.user.email }}</td>
+                        <td>{{ e.user.email }}</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-success" href="{% url 'courses:certificate_issue' pk=course.pk user_pk=e.user_id %}">Issue certificate</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">No qualifying students at the moment. Ensure course completion is set for students who have finished the course.</p>
+    {% endif %}
+
+    <h5 class="mt-4 mb-3">Already issued</h5>
+    {% if issued %}
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student</th>
+                        <th>Issued by</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in issued %}
+                    <tr>
+                        <td>{{ c.user.get_full_name|default:c.user.email }}</td>
+                        <td>{{ c.issued_by.get_full_name|default:c.issued_by.email }}</td>
+                        <td>{{ c.issued_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">No certificates issued yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Reject Course — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-dark-wrap">
+    <div class="container">
+        <h2 class="page-title">Reject course: {{ course.fullname }}</h2>
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="post" action="{% url 'courses:reject' pk=course.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="rejection_reason" class="form-label">Reason for rejection <span class="text-danger">*</span></label>
+                        <textarea name="rejection_reason" id="rejection_reason" class="form-control" rows="4" required
+                                  placeholder="Provide a clear reason and what needs to change...">{{ request.POST.rejection_reason }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary">Reject course</button>
+                    <a href="{% url 'courses:pending_approval' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

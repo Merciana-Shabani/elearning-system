@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}New Live Session — Elening LMS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control:focus, .form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 .2rem rgba(13,110,253,.15); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-7">
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a href="{% url 'conferences:list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h4 class="fw-bold mb-0">New Live Session</h4>
+                    <p class="text-muted small mb-0">Create a video conference room with screen sharing</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post" novalidate id="createRoomForm">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger small py-2">{{ form.non_field_errors|join:", " }}</div>
+                        {% endif %}
+
+                        <!-- Session Details -->
+                        <p class="text-uppercase text-muted fw-bold" style="font-size:.72rem;letter-spacing:1px;border-bottom:1px solid #dee2e6;padding-bottom:.4rem;margin-bottom:1rem;">Session details</p>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small" for="{{ form.title.id_for_label }}">Session title <span class="text-danger">*</span></label>
+                            <input type="text" name="title" id="{{ form.title.id_for_label }}"
+                                class="form-control{% if form.title.errors %} is-invalid{% endif %}"
+                                placeholder="e.g. Week 3 Live Lecture"
+                                value="{{ form.title.value|default:'' }}">
+                            {% if form.title.errors %}<div class="invalid-feedback">{{ form.title.errors|join:", " }}</div>{% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small" for="{{ form.description.id_for_label }}">Description</label>
+                            <textarea name="description" id="{{ form.description.id_for_label }}"
+                                class="form-control" rows="3"
+                                placeholder="What will be covered in this session?">{{ form.description.value|default:'' }}</textarea>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ form.course.id_for_label }}">Course (optional)</label>
+                                <select name="course" id="{{ form.course.id_for_label }}" class="form-select{% if form.course.errors %} is-invalid{% endif %}">
+                                    <option value="">— No specific course —</option>
+                                    {% for choice in form.course.field.queryset %}
+                                    <option value="{{ choice.pk }}" {% if form.course.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ choice.shortname }} — {{ choice.fullname }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small" for="{{ form.scheduled_at.id_for_label }}">
+                                    Scheduled at <span class="text-muted fw-normal">(optional)</span>
+                                </label>
+                                <input type="datetime-local" name="scheduled_at" id="{{ form.scheduled_at.id_for_label }}"
+                                    class="form-control{% if form.scheduled_at.errors %} is-invalid{% endif %}"
+                                    value="{{ form.scheduled_at.value|default:'' }}">
+                                {% if form.scheduled_at.errors %}<div class="invalid-feedback">{{ form.scheduled_at.errors|join:", " }}</div>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small" for="{{ form.duration_minutes.id_for_label }}">
+                                Period / duration <span class="text-muted fw-normal">(minutes)</span>
+                            </label>
+                            <input type="number" name="duration_minutes" id="{{ form.duration_minutes.id_for_label }}"
+                                class="form-control{% if form.duration_minutes.errors %} is-invalid{% endif %}"
+                                min="15" step="15" value="{{ form.duration_minutes.value|default:'120' }}">
+                            {% if form.duration_minutes.errors %}<div class="invalid-feedback">{{ form.duration_minutes.errors|join:", " }}</div>{% endif %}
+                            <div class="form-text" style="color:#94a3b8;font-size:.75rem;">Example: 120 minutes (2 hours), 300 minutes (5 hours).</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small" for="{{ form.max_participants.id_for_label }}">Max participants <span class="text-muted fw-normal">(0 = unlimited)</span></label>
+                            <input type="number" name="max_participants" id="{{ form.max_participants.id_for_label }}"
+                                class="form-control" min="0" value="{{ form.max_participants.value|default:'0' }}">
+                        </div>
+
+                        <!-- Security -->
+                        <p class="text-uppercase text-muted fw-bold mt-4" style="font-size:.72rem;letter-spacing:1px;border-bottom:1px solid #dee2e6;padding-bottom:.4rem;margin-bottom:1rem;">Security</p>
+
+                        <div class="form-check mb-2" id="requirePasswordCheck">
+                            <input class="form-check-input" type="checkbox" name="require_password"
+                                id="{{ form.require_password.id_for_label }}"
+                                {% if form.require_password.value %}checked{% endif %}>
+                            <label class="form-check-label small" for="{{ form.require_password.id_for_label }}">
+                                Require a password to join
+                            </label>
+                        </div>
+
+                        <div id="passwordField" class="mb-3" style="display:none;">
+                            <label class="form-label fw-semibold small" for="{{ form.room_password.id_for_label }}">Room password</label>
+                            <input type="text" name="room_password" id="{{ form.room_password.id_for_label }}"
+                                class="form-control" placeholder="Enter a password"
+                                value="{{ form.room_password.value|default:'' }}">
+                        </div>
+
+                        <!-- Features info -->
+                        <div class="alert alert-info small py-2 mt-3 mb-4">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Sessions are powered by <strong>Jitsi Meet</strong> and support HD video, audio, <strong>screen sharing</strong>, chat, hand-raising, and recording — no plugin needed.
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a href="{% url 'conferences:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-camera-video me-1"></i>Create Session
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const requirePwCheck = document.getElementById('{{ form.require_password.id_for_label }}');
+    const pwField = document.getElementById('passwordField');
+
+    function togglePwField() {
+        pwField.style.display = requirePwCheck.checked ? 'block' : 'none';
+    }
+    togglePwField();
+    requirePwCheck.addEventListener('change', togglePwField);
+</script>
+{% endblock %}

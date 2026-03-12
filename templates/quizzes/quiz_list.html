@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Quizzes — Elening LMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-patch-question me-2 text-primary"></i>Quizzes</h2>
+            <p class="text-muted mb-0">
+                {% if user.is_instructor %}Quizzes in your courses.{% else %}Quizzes available in your enrolled courses.{% endif %}
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            {% if user.is_instructor or user.is_staff %}
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-plus-lg me-1"></i>Create quiz
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    {% for c in my_courses %}
+                    <li>
+                        <a class="dropdown-item" href="{% url 'quizzes:create' course_pk=c.pk %}">
+                            {{ c.fullname }}
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li><span class="dropdown-item-text text-muted">No courses yet</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <a href="{% url 'courses:list' %}" class="btn btn-outline-primary">
+                <i class="bi bi-book me-1"></i>Course catalog
+            </a>
+        </div>
+    </div>
+
+    {% if quizzes %}
+    <div class="card border-0 shadow-sm">
+        <div class="list-group list-group-flush">
+            {% for quiz in quizzes %}
+            <a href="{% url 'quizzes:detail' pk=quiz.pk %}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+                <div class="min-width-0">
+                    <div class="fw-semibold text-truncate">{{ quiz.name }}</div>
+                    <div class="text-muted small text-truncate">
+                        <i class="bi bi-book me-1"></i>{{ quiz.course.shortname }} — {{ quiz.course.fullname }}
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-patch-question text-muted" style="font-size:3rem;"></i>
+        <h5 class="mt-3">No quizzes found</h5>
+        <p class="text-muted">Quizzes will appear here when they are created in a course.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
