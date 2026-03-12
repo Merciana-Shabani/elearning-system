@@ -8,6 +8,7 @@ urlpatterns = [
     path('course/<int:course_pk>/section/<int:section_pk>/create/', views.QuizCreateView.as_view(), name='create_in_section'),
     path('', views.QuizListView.as_view(), name='list'),
     path('<int:pk>/', views.QuizDetailView.as_view(), name='detail'),
+    path('<int:pk>/edit/', views.QuizUpdateView.as_view(), name='edit'),
     path('<int:quiz_pk>/questions/add/', views.QuestionCreateView.as_view(), name='question_add'),
     path('question/<int:pk>/edit/', views.QuestionUpdateView.as_view(), name='question_edit'),
     path('question/<int:question_pk>/answers/add/', views.AnswerCreateView.as_view(), name='answer_add'),

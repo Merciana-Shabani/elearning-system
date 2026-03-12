@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone as tz
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit, Fieldset
 from apps.courses.models import CourseSection
@@ -13,8 +14,14 @@ class QuizCreateForm(forms.ModelForm):
         model = Quiz
         fields = ['section', 'name', 'intro', 'time_open', 'time_close', 'time_limit', 'attempts_allowed', 'visible']
         widgets = {
-            'time_open': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'time_close': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'time_open': forms.DateTimeInput(
+                attrs={'type': 'datetime-local'},
+                format='%Y-%m-%dT%H:%M',
+            ),
+            'time_close': forms.DateTimeInput(
+                attrs={'type': 'datetime-local'},
+                format='%Y-%m-%dT%H:%M',
+            ),
         }
 
     def __init__(self, *args, course=None, **kwargs):
@@ -25,7 +32,11 @@ class QuizCreateForm(forms.ModelForm):
         # Require start/end times (business rule)
         self.fields['time_open'].required = True
         self.fields['time_close'].required = True
+        # Accept browser datetime-local format
+        for fname in ('time_open', 'time_close'):
+            self.fields[fname].input_formats = ['%Y-%m-%dT%H:%M', '%Y-%m-%d %H:%M', '%Y-%m-%dT%H:%M:%S']
 
+        submit_label = 'Save changes' if (self.instance and self.instance.pk) else 'Create quiz'
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Fieldset(
@@ -48,8 +59,21 @@ class QuizCreateForm(forms.ModelForm):
                     Column('visible', css_class='col-md-4'),
                 ),
             ),
-            Submit('submit', 'Create quiz', css_class='btn btn-primary mt-3'),
+            Submit('submit', submit_label, css_class='btn btn-primary mt-3'),
         )
+
+    def clean_time_open(self):
+        value = self.cleaned_data.get('time_open')
+        if value and tz.is_naive(value):
+            # Always interpret as site timezone (TIME_ZONE) so "15:00" = 15:00 local
+            value = tz.make_aware(value, tz.get_default_timezone())
+        return value
+
+    def clean_time_close(self):
+        value = self.cleaned_data.get('time_close')
+        if value and tz.is_naive(value):
+            value = tz.make_aware(value, tz.get_default_timezone())
+        return value
 
     def clean(self):
         cleaned = super().clean()

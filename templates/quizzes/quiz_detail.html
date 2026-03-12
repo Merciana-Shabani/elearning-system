@@ -16,6 +16,9 @@
                 <i class="bi bi-arrow-left me-1"></i>Back to course
             </a>
             {% if is_teacher %}
+            <a href="{% url 'quizzes:edit' pk=quiz.pk %}" class="btn btn-primary">
+                <i class="bi bi-pencil me-1"></i>Edit quiz
+            </a>
             <a href="{% url 'quizzes:list' %}" class="btn btn-outline-primary">
                 <i class="bi bi-list-ul me-1"></i>My quizzes
             </a>

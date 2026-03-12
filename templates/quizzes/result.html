@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load grade_tags %}
 
 {% block title %}Quiz result — {{ attempt.quiz.name }}{% endblock %}
 
@@ -63,13 +64,12 @@
                         {% if q.question_type == 'essay' or q.question_type == 'shortanswer' %}
                             <div class="border rounded p-3 bg-light">{{ r.text_response|default:"(no answer)" }}</div>
                         {% else %}
-                            <ul class="mb-0">
-                                {% for a in r.selected_answers.all %}
-                                <li>{{ a.answer_text }}</li>
-                                {% empty %}
-                                <li class="text-muted">(no answer)</li>
-                                {% endfor %}
-                            </ul>
+                            <div class="border rounded p-3 bg-light">
+                                <div class="mb-1"><strong>You wrote:</strong> {{ r.text_response|default:"(no answer)" }}</div>
+                                {% if r.selected_answers.all %}
+                                <div class="text-muted small">Matched option: {% for a in r.selected_answers.all %}{{ a.answer_text }}{% if not forloop.last %}; {% endif %}{% endfor %}</div>
+                                {% endif %}
+                            </div>
                         {% endif %}
                     {% else %}
                         <div class="text-muted">(no response)</div>

@@ -137,6 +137,52 @@ class QuizCreateView(TeacherRequiredMixin, CreateView):
         return redirect('courses:content', pk=self.course.pk)
 
 
+class QuizUpdateView(TeacherRequiredMixin, UpdateView):
+    """Instructor: edit quiz settings and update the course module link."""
+    model = Quiz
+    form_class = QuizCreateForm
+    template_name = 'quizzes/quiz_edit.html'
+    context_object_name = 'quiz'
+
+    def dispatch(self, request, *args, **kwargs):
+        quiz = self.get_object()
+        if quiz.course.teacher != request.user and not request.user.is_staff:
+            messages.error(request, 'You can only edit quizzes in your own courses.')
+            return redirect('quizzes:detail', pk=quiz.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['course'] = self.object.course
+        return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        mod = CourseModule.objects.filter(
+            course=self.object.course,
+            module_type=CourseModule.MODULE_QUIZ,
+            instance_id=self.object.pk,
+        ).first()
+        if mod and mod.section_id:
+            initial['section'] = mod.section_id
+        return initial
+
+    def form_valid(self, form):
+        form.save()
+        mod = CourseModule.objects.filter(
+            course=self.object.course,
+            module_type=CourseModule.MODULE_QUIZ,
+            instance_id=self.object.pk,
+        ).first()
+        if mod:
+            mod.section = form.cleaned_data.get('section') or mod.section
+            mod.name = self.object.name
+            mod.visible = self.object.visible
+            mod.save()
+        messages.success(self.request, 'Quiz updated.')
+        return redirect('quizzes:detail', pk=self.object.pk)
+
+
 class QuestionCreateView(TeacherRequiredMixin, CreateView):
     """Instructor: add a question to a quiz (then add answers so quiz can be marked automatically)."""
     model = Question
@@ -221,7 +267,8 @@ class AnswerCreateView(TeacherRequiredMixin, CreateView):
 def start_attempt(request, pk):
     quiz = get_object_or_404(Quiz, pk=pk, visible=True)
 
-    if not Enrollment.objects.filter(
+    is_teacher = quiz.course.teacher == request.user or request.user.is_staff
+    if not is_teacher and not Enrollment.objects.filter(
         user=request.user, course=quiz.course, status='active'
     ).exists():
         messages.error(request, 'You must be enrolled to take this quiz.')
@@ -307,6 +354,36 @@ def take_attempt(request, attempt_pk):
     })
 
 
+def _written_answer_to_choice(question, text):
+    """Map student's written answer (e.g. '1', 'A', or option text) to an Answer, or None."""
+    if not text or not text.strip():
+        return None
+    text = text.strip()
+    answers = list(question.answers.order_by('sortorder'))
+    if not answers:
+        return None
+    # By number: 1, 2, 3, ...
+    if text.isdigit():
+        idx = int(text)
+        if 1 <= idx <= len(answers):
+            return answers[idx - 1]
+    # By letter: A, a, B, b, ...
+    if len(text) == 1:
+        upper = text.upper()
+        if 'A' <= upper <= 'Z':
+            idx = ord(upper) - ord('A')
+            if idx < len(answers):
+                return answers[idx]
+    # By matching option text (case-insensitive)
+    text_lower = text.lower()
+    for answer in answers:
+        if text_lower in (answer.answer_text or '').lower():
+            return answer
+        if (answer.answer_text or '').strip().lower() in text_lower:
+            return answer
+    return None
+
+
 def _save_responses(request, attempt, questions):
     for question in questions:
         response, _ = QuestionResponse.objects.get_or_create(
@@ -316,8 +393,14 @@ def _save_responses(request, attempt, questions):
             response.text_response = request.POST.get(f'q_{question.pk}', '')
             response.save()
         else:
-            answer_ids = request.POST.getlist(f'q_{question.pk}')
-            response.selected_answers.set(answer_ids)
+            # Multiple choice / truefalse: student writes answer in a text box
+            raw = request.POST.get(f'q_{question.pk}', '').strip()
+            response.text_response = raw
+            chosen = _written_answer_to_choice(question, raw)
+            if chosen:
+                response.selected_answers.set([chosen])
+            else:
+                response.selected_answers.clear()
             response.save()
 
 
