@@ -334,3 +334,30 @@ def clear_signup_type(request):
     request.session.pop('signup_student_type', None)
     request.session.modified = True
     return redirect('account_signup')
+## Ongeza hizi kwenye views.py yako (au accounts/views.py)
+
+from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
+
+@require_POST
+def set_signup_type(request):
+    """Hifadhi role kwenye session kisha redirect signup."""
+    role = request.POST.get('signup_role', '')
+    student_type = request.POST.get('signup_student_type', 'normal_staff')
+    
+    if role in ('student', 'teacher', 'moderator'):
+        request.session['signup_role'] = role
+        if role == 'student':
+            request.session['signup_student_type'] = student_type
+        else:
+            request.session['signup_student_type'] = ''
+    
+    return redirect('account_signup')
+
+
+@require_POST  
+def clear_signup_type(request):
+    
+    request.session.pop('signup_role', None)
+    request.session.pop('signup_student_type', None)
+    return redirect('account_signup')

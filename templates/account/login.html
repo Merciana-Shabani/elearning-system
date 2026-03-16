@@ -1,337 +1,231 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load i18n %}
 
-{% block title %}Sign In — Elening LMS{% endblock %}
+{% block title %}Sign In — TPF Training Portal{% endblock %}
+
+{% block footer %}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .auth-page {
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --navy: #0d1f4e;
+        --border: #cdd5e8;
+        --input-bg: #f5f7fc;
+        --light-bg: #eef1f8;
+        --card-bg: #f0f3fa;
+        --white: #ffffff;
+    }
+
+    .login-wrap {
         min-height: calc(100vh - 56px);
         display: flex;
-        align-items: stretch;
-        background: #f0f4f8;
+        align-items: center;
+        justify-content: center;
+        background: var(--light-bg);
+        padding: 2rem 1rem;
     }
 
-    /* Left panel */
-    .auth-brand {
-        background: linear-gradient(160deg, #0a1f3d 0%, #0d2b4e 55%, #163d6e 100%);
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 3.5rem 2.5rem;
-        text-align: center;
-    }
-    .auth-brand::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
-    .auth-brand-glow {
-        position: absolute;
-        width: 400px; height: 400px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(30,87,153,.4) 0%, transparent 70%);
-        bottom: -100px; right: -100px;
-        pointer-events: none;
-    }
-    .auth-brand-logo {
-        width: 72px; height: 72px;
-        border-radius: 20px;
-        background: rgba(255,255,255,.12);
-        border: 1px solid rgba(255,255,255,.18);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 2.2rem;
-        color: #fff;
-        margin-bottom: 1.5rem;
-        backdrop-filter: blur(8px);
-    }
-    .auth-brand h2 {
-        color: #fff;
-        font-weight: 800;
-        font-size: 1.6rem;
-        letter-spacing: -.4px;
-        margin-bottom: .6rem;
-    }
-    .auth-brand p {
-        color: rgba(255,255,255,.65);
-        font-size: .9rem;
-        max-width: 230px;
-        line-height: 1.6;
-        margin-bottom: 2rem;
-    }
-    .auth-feature {
-        display: flex;
-        align-items: center;
-        gap: .8rem;
-        text-align: left;
-        margin-bottom: .85rem;
+    .login-card {
+        background: var(--card-bg);
+        border: 1.5px solid #c8cfe8;
+        border-radius: 24px;
+        padding: 3rem 2.5rem 2.8rem;
         width: 100%;
-        max-width: 250px;
-    }
-    .auth-feature-icon {
-        width: 34px; height: 34px;
-        border-radius: 9px;
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-        font-size: .95rem;
-    }
-    .auth-feature span {
-        color: rgba(255,255,255,.8);
-        font-size: .84rem;
-        line-height: 1.4;
+        max-width: 480px;
+        text-align: center;
+        box-shadow: 0 8px 40px rgba(13,31,78,.08);
     }
 
-    /* Right / form panel */
-    .auth-form-panel {
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 3rem 2.5rem;
-    }
-    .auth-form-panel .form-label {
-        font-size: .82rem;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: .35rem;
-    }
-    .auth-input-group .input-group-text {
-        background: #f8fafc;
-        border-color: #e2e8f0;
-        border-right: none;
-        color: #94a3b8;
-    }
-    .auth-input-group .form-control {
-        border-color: #e2e8f0;
-        border-left: none;
-        background: #f8fafc;
-        font-size: .9rem;
-        color: #1e293b;
-    }
-    .auth-input-group .form-control::placeholder { color: #94a3b8; }
-    .auth-input-group .form-control:focus {
-        border-color: #0d2b4e;
-        box-shadow: none;
-        background: #fff;
-    }
-    .auth-input-group:focus-within .input-group-text {
-        border-color: #0d2b4e;
-        background: #fff;
-        color: #0d2b4e;
-    }
-    .auth-input-group .toggle-pw {
-        border-color: #e2e8f0;
-        border-left: none;
-        background: #f8fafc;
-        color: #94a3b8;
-        cursor: pointer;
-    }
-    .auth-input-group:focus-within .toggle-pw {
-        border-color: #0d2b4e;
-        background: #fff;
-    }
-    .btn-auth {
-        background: linear-gradient(135deg, #0d2b4e, #1e5799);
-        border: none;
-        color: #fff;
-        font-weight: 700;
-        font-size: .95rem;
-        padding: .75rem;
-        border-radius: 10px;
-        letter-spacing: .3px;
-        transition: opacity .2s, transform .15s;
-    }
-    .btn-auth:hover { opacity: .92; transform: translateY(-1px); color: #fff; }
-
-    .auth-divider {
-        display: flex; align-items: center; gap: 1rem;
-        color: #94a3b8; font-size: .78rem; margin: 1.25rem 0;
-    }
-    .auth-divider::before,
-    .auth-divider::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
-
-    .auth-section-heading {
-        font-size: .7rem;
-        font-weight: 700;
+    .login-card h1 {
+        font-family: 'EB Garamond', serif;
+        font-weight: 800;
+        font-size: 1.65rem;
+        color: var(--navy);
         text-transform: uppercase;
-        letter-spacing: 1.2px;
-        color: #94a3b8;
+        letter-spacing: 1.5px;
+        margin-bottom: 1.6rem;
+    }
+
+    .tpf-logo-wrap {
+        width: 110px;
+        height: 110px;
+        margin: 0 auto 1.6rem;
+    }
+    .tpf-logo-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .login-subtitle {
+        font-size: .95rem;
+        color: #4a5a7a;
+        margin-bottom: 1.8rem;
+        font-family: 'Source Sans 3', sans-serif;
+    }
+
+    /* Inputs */
+    .login-input-group {
         margin-bottom: 1rem;
+        text-align: left;
     }
-    .auth-back-link {
-        display: inline-flex; align-items: center; gap: .4rem;
-        color: #94a3b8; font-size: .82rem; text-decoration: none;
-        margin-bottom: 1.5rem;
+    .login-input-group .input-group-text {
+        background: var(--white);
+        border: 1.5px solid var(--border);
+        border-right: none;
+        color: #7a8aaa;
+        padding: .65rem .9rem;
+        border-radius: 10px 0 0 10px;
     }
-    .auth-back-link:hover { color: #0d2b4e; }
+    .login-input-group .form-control {
+        background: var(--white);
+        border: 1.5px solid var(--border);
+        border-left: none;
+        font-size: .92rem;
+        color: #1e293b;
+        padding: .65rem .9rem;
+        border-radius: 0 10px 10px 0;
+        font-style: italic;
+    }
+    .login-input-group .form-control::placeholder {
+        color: #9aaac8;
+        font-style: italic;
+    }
+    .login-input-group .form-control:focus {
+        border-color: var(--navy);
+        box-shadow: none;
+        background: var(--white);
+    }
+    .login-input-group:focus-within .input-group-text {
+        border-color: var(--navy);
+        color: var(--navy);
+    }
+    .toggle-pw {
+        background: var(--white) !important;
+        border: 1.5px solid var(--border) !important;
+        border-left: none !important;
+        color: #9aaac8 !important;
+        cursor: pointer;
+        border-radius: 0 10px 10px 0 !important;
+        padding: .65rem .9rem;
+    }
+    .login-input-group:focus-within .toggle-pw {
+        border-color: var(--navy) !important;
+    }
+
+    /* Log in button */
+    .btn-login {
+        width: 100%;
+        padding: .78rem;
+        background: var(--navy);
+        border: none;
+        border-radius: 10px;
+        color: var(--white);
+        font-family: 'Source Sans 3', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: .5px;
+        transition: opacity .2s, transform .15s;
+        margin-top: .5rem;
+        margin-bottom: 1.2rem;
+    }
+    .btn-login:hover {
+        opacity: .88;
+        transform: translateY(-1px);
+        color: var(--white);
+    }
+
+    .forgot-link {
+        font-family: 'Source Sans 3', sans-serif;
+        font-weight: 700;
+        font-size: .92rem;
+        color: var(--navy);
+        text-decoration: none;
+    }
+    .forgot-link:hover {
+        text-decoration: underline;
+        color: var(--navy);
+    }
+
+    .error-alert {
+        background: #fef2f2;
+        color: #991b1b;
+        border-radius: 10px;
+        padding: .5rem 1rem;
+        font-size: .85rem;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="auth-page">
-    <div class="container-fluid p-0">
-        <div class="row g-0 h-100">
+<div class="login-wrap">
+    <div class="login-card">
 
-            <!-- Brand panel (left) -->
-            <div class="col-lg-5 d-none d-lg-flex">
-                <div class="auth-brand w-100">
-                    <div class="auth-brand-glow"></div>
+        <h1>TPF Training Portal</h1>
 
-                    <div class="auth-brand-logo" style="padding:4px;">
-                        <img src="{% static 'img/tpf_logo.png' %}" style="width:56px;height:56px;object-fit:contain;" alt="TPF Logo">
-                    </div>
-                    <h2>TPF Training Portal</h2>
-                    <p>Official Tanzania Police Force e-learning and professional development platform.</p>
-
-                    <div class="auth-feature">
-                        <div class="auth-feature-icon" style="background:rgba(96,165,250,.15);">
-                            <i class="bi bi-play-circle-fill" style="color:#60a5fa;"></i>
-                        </div>
-                        <span>Access 200+ official training modules</span>
-                    </div>
-                    <div class="auth-feature">
-                        <div class="auth-feature-icon" style="background:rgba(52,211,153,.15);">
-                            <i class="bi bi-bar-chart-fill" style="color:#34d399;"></i>
-                        </div>
-                        <span>Track your training records and certifications</span>
-                    </div>
-                    <div class="auth-feature">
-                        <div class="auth-feature-icon" style="background:rgba(251,191,36,.15);">
-                            <i class="bi bi-camera-video-fill" style="color:#fbbf24;"></i>
-                        </div>
-                        <span>Attend live briefings and command sessions</span>
-                    </div>
-                    <div class="auth-feature">
-                        <div class="auth-feature-icon" style="background:rgba(167,139,250,.15);">
-                            <i class="bi bi-people-fill" style="color:#a78bfa;"></i>
-                        </div>
-                        <span>Trusted by 5,000+ TPF personnel</span>
-                    </div>
-
-                    <div class="mt-4 pt-3 w-100" style="max-width:250px;border-top:1px solid rgba(255,255,255,.1);">
-                        <p class="mb-0" style="color:rgba(255,255,255,.45);font-size:.78rem;">
-                            Don't have an account?
-                        </p>
-                        <a href="{% url 'account_signup' %}" class="text-white fw-semibold text-decoration-none" style="font-size:.85rem;">
-                            Register <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Form panel (right) -->
-            <div class="col-12 col-lg-7">
-                <div class="auth-form-panel h-100">
-                    <div style="max-width:420px;margin:0 auto;width:100%;">
-
-                        <!-- Mobile logo -->
-                        <div class="d-flex align-items-center gap-2 mb-4 d-lg-none">
-                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width:36px;height:36px;">
-                                <img src="{% static 'img/tpf_logo.png' %}" height="22" alt="TPF" style="object-fit:contain;">
-                            </div>
-                            <span class="fw-bold" style="color:#0d2b4e;font-size:1.05rem;">TPF Training Portal</span>
-                        </div>
-
-                        <div class="mb-4">
-                            <h3 class="fw-bold mb-1" style="color:#0d2b4e;">Officer Sign In</h3>
-                            <p class="text-muted mb-0" style="font-size:.9rem;">Access your Tanzania Police Force Training Portal</p>
-                        </div>
-
-                        {% if form.errors %}
-                        <div class="alert border-0 py-2 small mb-4" style="background:#fef2f2;color:#991b1b;border-radius:10px;">
-                            <i class="bi bi-exclamation-circle-fill me-1"></i>
-                            {% if form.non_field_errors %}
-                                {{ form.non_field_errors|join:", " }}
-                            {% else %}
-                                Invalid credentials. Please try again.
-                            {% endif %}
-                        </div>
-                        {% endif %}
-
-                        <form method="post" action="{% url 'account_login' %}" novalidate>
-                            {% csrf_token %}
-                            {% if redirect_field_value %}
-                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-                            {% endif %}
-
-                            <div class="mb-3">
-                                <label class="form-label" for="id_login">Email or Username</label>
-                                <div class="input-group auth-input-group">
-                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                    <input type="text" name="login" id="id_login"
-                                        class="form-control{% if form.login.errors %} is-invalid{% endif %}"
-                                        placeholder="you@example.com"
-                                        value="{{ form.login.value|default:'' }}"
-                                        autocomplete="email" autofocus>
-                                    {% if form.login.errors %}
-                                    <div class="invalid-feedback">{{ form.login.errors|join:", " }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <label class="form-label mb-0" for="id_password">Password</label>
-                                    <a href="{% url 'account_reset_password' %}" class="text-decoration-none fw-semibold"
-                                       style="font-size:.78rem;color:#1e5799;">Forgot password?</a>
-                                </div>
-                                <div class="input-group auth-input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input type="password" name="password" id="id_password"
-                                        class="form-control{% if form.password.errors %} is-invalid{% endif %}"
-                                        placeholder="••••••••" autocomplete="current-password">
-                                    <button type="button" class="input-group-text toggle-pw" id="togglePassword" title="Show/hide password">
-                                        <i class="bi bi-eye" id="togglePasswordIcon"></i>
-                                    </button>
-                                    {% if form.password.errors %}
-                                    <div class="invalid-feedback">{{ form.password.errors|join:", " }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="mb-4 d-flex align-items-center justify-content-between">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="remember" id="id_remember"
-                                        {% if form.remember.value %}checked{% endif %}>
-                                    <label class="form-check-label text-muted" for="id_remember" style="font-size:.83rem;">
-                                        Keep me signed in
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="d-grid mb-4">
-                                <button type="submit" class="btn btn-auth">
-                                    <i class="bi bi-shield-lock me-2"></i>Sign In
-                                </button>
-                            </div>
-
-                            <div class="auth-divider">or</div>
-
-                            <p class="text-center mb-0" style="font-size:.87rem;color:#64748b;">
-                                Don't have an account?
-                                <a href="{% url 'account_signup' %}" class="fw-bold text-decoration-none" style="color:#0d2b4e;">
-                                    Register
-                                </a>
-                            </p>
-                        </form>
-
-                        <div class="mt-5 pt-4" style="border-top:1px solid #f1f5f9;">
-                            <p class="text-center mb-0" style="font-size:.75rem;color:#94a3b8;">
-                                <i class="bi bi-shield-check me-1"></i>
-                                Your data is encrypted and secure. We never share your information.
-                            </p>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
+        <div class="tpf-logo-wrap">
+            <img src="{% static 'img/tpf_logo.png' %}" alt="Tanzania Police Force Logo">
         </div>
+
+        <p class="login-subtitle">Sign in to start your session</p>
+
+        {% if form.errors %}
+        <div class="error-alert">
+            <i class="bi bi-exclamation-circle-fill me-1"></i>
+            {% if form.non_field_errors %}
+                {{ form.non_field_errors|join:", " }}
+            {% else %}
+                Invalid credentials. Please try again.
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'account_login' %}" novalidate>
+            {% csrf_token %}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            {% endif %}
+
+            <div class="login-input-group">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="text" name="login" id="id_login"
+                        class="form-control{% if form.login.errors %} is-invalid{% endif %}"
+                        placeholder="Email"
+                        value="{{ form.login.value|default:'' }}"
+                        autocomplete="email" autofocus>
+                    {% if form.login.errors %}
+                    <div class="invalid-feedback">{{ form.login.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="login-input-group">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" name="password" id="id_password"
+                        class="form-control{% if form.password.errors %} is-invalid{% endif %}"
+                        placeholder="Password"
+                        autocomplete="current-password">
+                    <button type="button" class="input-group-text toggle-pw" id="togglePassword">
+                        <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                    </button>
+                    {% if form.password.errors %}
+                    <div class="invalid-feedback">{{ form.password.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">Log in</button>
+
+        </form>
+
+        <a href="{% url 'account_reset_password' %}" class="forgot-link">Forgot Password?</a>
+
     </div>
 </div>
 {% endblock %}
@@ -341,10 +235,12 @@
     const toggleBtn = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('id_password');
     const toggleIcon = document.getElementById('togglePasswordIcon');
-    toggleBtn.addEventListener('click', () => {
-        const hidden = passwordInput.type === 'password';
-        passwordInput.type = hidden ? 'text' : 'password';
-        toggleIcon.className = hidden ? 'bi bi-eye-slash' : 'bi bi-eye';
-    });
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            const hidden = passwordInput.type === 'password';
+            passwordInput.type = hidden ? 'text' : 'password';
+            toggleIcon.className = hidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+    }
 </script>
 {% endblock %}

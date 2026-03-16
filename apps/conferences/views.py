@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.views.generic import ListView
-
+from . import views
 from .models import ConferenceRoom
 from .forms import ConferenceRoomForm
 
@@ -92,3 +92,24 @@ def delete_room(request, slug):
         room.delete()
         messages.success(request, f'Room "{title}" deleted.')
     return redirect('conferences:list')
+
+def set_signup_type(request):
+    
+    role = request.POST.get('signup_role', '')
+    student_type = request.POST.get('signup_student_type', 'normal_staff')
+    
+    if role in ('student', 'teacher', 'moderator'):
+        request.session['signup_role'] = role
+        if role == 'student':
+            request.session['signup_student_type'] = student_type
+        else:
+            request.session['signup_student_type'] = ''
+    
+    return redirect('account_signup')
+ 
+ 
+ 
+def clear_signup_type(request):
+    request.session.pop('signup_role', None)
+    request.session.pop('signup_student_type', None)
+    return redirect('account_signup')

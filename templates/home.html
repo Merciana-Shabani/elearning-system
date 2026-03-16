@@ -5,336 +5,156 @@
 
 {% block extra_css %}
 <style>
-    .hero-section {
-        background: linear-gradient(135deg, #0a1f3d 0%, #0d2b4e 50%, #163d6e 100%);
-        position: relative;
-        overflow: hidden;
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --navy: #0d1f4e;
+        --navy-dark: #081535;
+        --gold: #c8a84b;
+        --gold-light: #e0c87a;
+        --white: #ffffff;
     }
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+
+    body { font-family: 'Book Antiqua', serif; margin: 0; padding: 0; }
+
+    /* ── TOP HEADER ── */
+    .tpf-top-header {
+        background: #1c236d;
+        border-bottom: 3px ;
+        padding: 12px 0;
     }
-    .hero-glow {
-        position: absolute;
-        width: 600px; height: 600px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(30,87,153,.35) 0%, transparent 70%);
-        top: -200px; right: -100px;
-        pointer-events: none;
+    .tpf-top-header .header-title {
+        font-family: 'EB Garamond', serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--white);
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        line-height: 1.6;
+        text-align: center;
     }
-    .stats-bar { background: #0a1f3d; border-top: 1px solid rgba(255,255,255,.07); }
-    .stat-item { border-right: 1px solid rgba(255,255,255,.08); }
-    .stat-item:last-child { border-right: none; }
-    .stat-number {
-        font-size: 1.9rem; font-weight: 800;
-        background: linear-gradient(135deg, #60a5fa, #93c5fd);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        background-clip: text;
+    .tpf-top-header .header-title span {
+        display: block;
+        font-size: .95rem;
+        font-weight: 600;
     }
-    .feature-card {
-        border: 1px solid #e8eef5; border-radius: 16px;
-        padding: 2rem 1.5rem; background: #fff;
-        transition: transform .25s, box-shadow .25s, border-color .25s; height: 100%;
+    .tpf-top-header img.crest {
+        height: 70px;
+        object-fit: contain;
     }
-    .feature-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(13,43,78,.12); border-color: #93c5fd; }
-    .feature-icon-wrap { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin-bottom:1.1rem; }
-    .role-card {
-        border-radius: 16px; border: 1px solid #e8eef5; background: #fff;
-        padding: 2rem 1.5rem; text-align: center;
-        transition: transform .25s, box-shadow .25s; height: 100%;
+
+    /* ── HERO ── */
+    .tpf-hero {
+        background: #e8eff8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='520'%3E%3Cdefs%3E%3Cstyle%3E.g%7Bfill:none;stroke:%238fa8cc;stroke-opacity:.2;%7D%3C/style%3E%3C/defs%3E%3Ccircle class='g' cx='130' cy='140' r='90' stroke-width='2'/%3E%3Ccircle class='g' cx='130' cy='140' r='65' stroke-width='1.5'/%3E%3Ccircle class='g' cx='130' cy='140' r='35'/%3E%3Ccircle class='g' cx='130' cy='140' r='12'/%3E%3Ccircle class='g' cx='1050' cy='350' r='110' stroke-width='2'/%3E%3Ccircle class='g' cx='1050' cy='350' r='80' stroke-width='1.5'/%3E%3Ccircle class='g' cx='1050' cy='350' r='45'/%3E%3Ccircle class='g' cx='1050' cy='350' r='15'/%3E%3Ccircle class='g' cx='1100' cy='90' r='65' stroke-width='1.5'/%3E%3Ccircle class='g' cx='1100' cy='90' r='40'/%3E%3Ccircle class='g' cx='60' cy='430' r='55'/%3E%3Ccircle class='g' cx='60' cy='430' r='28'/%3E%3Ccircle class='g' cx='600' cy='480' r='30'/%3E%3Ccircle class='g' cx='600' cy='480' r='15'/%3E%3Cpath class='g' d='M0 200 Q200 120 400 200 T800 160 T1200 220' stroke-width='1'/%3E%3Cpath class='g' d='M0 300 Q250 220 500 310 T900 270 T1200 320' stroke-width='.8'/%3E%3Cpath class='g' d='M100 50 Q300 20 500 80 T850 40 T1100 70' stroke-width='.7'/%3E%3Crect class='g' x='420' y='80' width='70' height='70' rx='6' stroke-width='1.2' transform='rotate(15 455 115)'/%3E%3Crect class='g' x='700' y='200' width='55' height='55' rx='4' stroke-width='1' transform='rotate(-12 727 227)'/%3E%3Crect class='g' x='280' y='340' width='48' height='48' rx='5' stroke-width='1' transform='rotate(8 304 364)'/%3E%3Cpolygon class='g' points='240,420 265,370 290,420' stroke-width='1'/%3E%3C/svg%3E") center/cover no-repeat;
+        padding: 90px 0 110px;
+        text-align: center;
+        min-height: 420px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    .role-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(13,43,78,.1); }
-    .role-icon { width:68px; height:68px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.9rem; margin:0 auto 1.1rem; }
-    .step-number { width:44px; height:44px; border-radius:50%; background:#0d2b4e; color:#fff; font-weight:800; font-size:1.1rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .cta-section { background: linear-gradient(135deg, #0d2b4e 0%, #1e5799 100%); position:relative; overflow:hidden; }
-    .cta-section::after { content:''; position:absolute; right:-80px; bottom:-80px; width:320px; height:320px; border-radius:50%; border:60px solid rgba(255,255,255,.05); pointer-events:none; }
-    .section-label { font-size:.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#1e5799; }
-    .trust-badge { display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:100px; padding:.35rem .9rem; color:#93c5fd; font-size:.8rem; font-weight:600; backdrop-filter:blur(4px); }
+    .tpf-hero h1 {
+        font-family: 'EB Garamond', serif;
+        font-size: 3.6rem;
+        font-weight: 800;
+        color: var(--navy);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        line-height: 1.15;
+        margin-bottom: .3rem;
+    }
+    .tpf-hero h2 {
+        font-family: 'EB Garamond', serif;
+        font-size: 2.1rem;
+        font-weight: 600;
+        color: var(--navy);
+        margin-bottom: 2.8rem;
+        letter-spacing: .5px;
+    }
+    .tpf-login-btn {
+        display: inline-block;
+        padding: .7rem 2.8rem;
+        border: 2px solid var(--navy);
+        border-radius: 50px;
+        color: var(--navy);
+        font-family: 'Source Sans 3', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: .5px;
+        text-decoration: none;
+        transition: background .2s, color .2s;
+        background: transparent;
+    }
+    .tpf-login-btn:hover {
+        background: var(--navy);
+        color: var(--white);
+    }
+
+    /* ── FOOTER ── */
+    .tpf-footer {
+        background: #1c236d;
+        padding: 40px 0 0;
+        color: rgba(255,255,255,.85);
+    }
+    .tpf-footer h6 {
+        font-family: 'EB Garamond', serif;
+        font-weight: 700;
+        font-size: 1rem;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        padding-bottom: .4rem;
+        border-bottom: 1px solid rgba(200,168,75,.3);
+    }
+    .tpf-footer p,
+    .tpf-footer li,
+    .tpf-footer a {
+        font-size: .875rem;
+        color: rgba(255,255,255,.78);
+        line-height: 1.75;
+    }
+    .tpf-footer a { text-decoration: none; }
+    .tpf-footer a:hover { color: var(--gold-light); }
+    .tpf-footer .footer-bottom {
+        border-top: 1px solid rgba(255,255,255,.1);
+        margin-top: 28px;
+        padding: 14px 0;
+        font-size: .82rem;
+        color: rgba(255,255,255,.5);
+        text-align: center;
+    }
+    .tpf-footer .footer-bottom strong { color: rgba(255,255,255,.72); }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
-<section class="hero-section py-5">
-    <div class="hero-glow"></div>
-    <div class="container py-5 position-relative">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6">
-                <div class="trust-badge mb-4">
-                    <img src="{% static 'img/tpf_logo.png' %}" height="16" style="object-fit:contain;filter:brightness(0) invert(1);vertical-align:middle;">
-                    Tanzania Police Force — Official Training Portal
-                </div>
-                <h1 class="display-4 fw-bold text-white lh-sm mb-4">
-                    Advance Your Skills,<br>
-                    <span style="color:#60a5fa;">Serve with Excellence.</span>
-                </h1>
-                <p class="fs-5 mb-5" style="color:rgba(255,255,255,.75);max-width:480px;line-height:1.7;">
-                    The official e-learning platform for Tanzania Police Force personnel.
-                    Access training modules, live briefings, assessments, and professional
-                    development tools — all in one secure portal.
-                </p>
-                <div class="d-flex gap-3 flex-wrap mb-4">
-                    <a href="{% url 'account_login' %}" class="btn btn-light btn-lg fw-semibold px-4 shadow">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Officer Login
-                    </a>
-                    <a href="{% url 'account_signup' %}" class="btn btn-outline-light btn-lg px-4">
-                        <i class="bi bi-person-plus me-2"></i>Register
-                    </a>
-                </div>
-                <div class="d-flex gap-4 flex-wrap" style="color:rgba(255,255,255,.55);font-size:.85rem;">
-                    <span><i class="bi bi-check-circle me-1 text-success"></i>Secure access</span>
-                    <span><i class="bi bi-check-circle me-1 text-success"></i>Official platform</span>
-                    <span><i class="bi bi-check-circle me-1 text-success"></i>Track records</span>
-                </div>
+<!-- ── TOP HEADER ── -->
+<header class="tpf-top-header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <img src="{% static 'img/tz ngao.png' %}" class="crest" alt="Coat of Arms of Tanzania">
+            <div class="header-title">
+                The United Republic of Tanzania
+                <span>Ministry of Home Affairs</span>
+                <span style="font-size:1.1rem;letter-spacing:1px;">Tanzania Police Force</span>
             </div>
-            <div class="col-lg-6 d-none d-lg-flex justify-content-center align-items-center">
-                <div class="position-relative" style="width:360px;height:340px;">
-                    <!-- Floating cards -->
-                    <div class="card border-0 shadow-lg p-3 position-absolute" style="border-radius:16px;top:0;left:20px;width:210px;animation:float 4s ease-in-out infinite;">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width:34px;height:34px;font-size:.75rem;font-weight:700;">AK</div>
-                            <div>
-                                <div class="fw-semibold" style="font-size:.8rem;">Insp. Ali Komba</div>
-                                <div class="text-muted" style="font-size:.7rem;">Officer</div>
-                            </div>
-                        </div>
-                        <div class="text-muted" style="font-size:.75rem;">Completed <strong>Criminal Law Module</strong></div>
-                        <div class="progress mt-2" style="height:5px;">
-                            <div class="progress-bar bg-success" style="width:100%"></div>
-                        </div>
-                    </div>
-                    <div class="card border-0 shadow-lg p-3 position-absolute" style="border-radius:16px;bottom:40px;right:0;width:190px;animation:float 4s ease-in-out infinite 1s;">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
-                                <i class="bi bi-camera-video text-danger" style="font-size:.9rem;"></i>
-                            </div>
-                            <div>
-                                <div class="fw-semibold" style="font-size:.78rem;">Live Briefing</div>
-                                <div class="text-muted" style="font-size:.7rem;">Starting now</div>
-                            </div>
-                        </div>
-                        <span class="badge bg-danger" style="font-size:.65rem;">● LIVE</span>
-                    </div>
-                    <div class="card border-0 shadow-lg p-3 position-absolute" style="border-radius:16px;top:130px;left:0;width:175px;animation:float 4s ease-in-out infinite 2s;">
-                        <div class="text-warning mb-1" style="font-size:.75rem;font-weight:700;">ASSESSMENT</div>
-                        <div class="fw-bold" style="font-size:1.8rem;color:#0d2b4e;">88%</div>
-                        <div class="text-muted" style="font-size:.72rem;">Tactical Procedures</div>
-                        <div class="d-flex gap-1 mt-1">
-                            {% for i in "12345" %}<i class="bi bi-star-fill text-warning" style="font-size:.6rem;"></i>{% endfor %}
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-center position-absolute rounded-circle shadow-lg"
-                         style="width:100px;height:100px;background:linear-gradient(135deg,#0d2b4e,#1e5799);top:50%;left:50%;transform:translate(-50%,-50%);">
-                        <img src="{% static 'img/tpf_logo.png' %}" style="width:70px;height:70px;object-fit:contain;filter:brightness(0) invert(1);">
-                    </div>
-                </div>
-            </div>
+            <img src="{% static 'img/tpf_logo.png' %}" class="crest" alt="Tanzania Police Force Logo">
         </div>
+    </div>
+</header>
+
+<!-- ── HERO ── -->
+<section class="tpf-hero">
+    <div class="container">
+        <h1>Tanzania Police Force</h1>
+        <h2>Training portal</h2>
+        <a href="{% url 'account_signup' %}" class="tpf-login-btn">Register</a>
+        <a href="{% url 'account_login' %}" class="tpf-login-btn">Login</a>
     </div>
 </section>
 
-<style>
-@keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
-</style>
 
-<!-- ANNOUNCEMENTS BANNER -->
-<section style="background:#0a1f3d;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);">
-    <div class="container py-3">
-        <div class="d-flex align-items-center gap-3 flex-wrap">
-            <span class="badge text-uppercase fw-bold px-3 py-2 flex-shrink-0" style="background:#1e5799;font-size:.7rem;letter-spacing:1px;">
-                <i class="bi bi-megaphone-fill me-1"></i>Announcements
-            </span>
-            <div class="d-flex gap-4 flex-wrap" style="color:rgba(255,255,255,.85);font-size:.88rem;">
-                <span><i class="bi bi-circle-fill me-2" style="color:#34d399;font-size:.45rem;vertical-align:middle;"></i>Welcome to the TPF Training Portal — your official professional development platform.</span>
-                <span class="d-none d-md-inline"><i class="bi bi-circle-fill me-2" style="color:#fbbf24;font-size:.45rem;vertical-align:middle;"></i>New training modules added for Q1 2026. Check your assigned courses.</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="py-5 bg-white">
-    <div class="container py-3">
-        <div class="text-center mb-5">
-            <div class="section-label mb-2">Getting Started</div>
-            <h2 class="fw-bold mb-2" style="color:#0d2b4e;">Access Training in 3 Steps</h2>
-            <p class="text-muted" style="max-width:480px;margin:0 auto;">Simple, secure process for all Tanzania Police Force personnel.</p>
-        </div>
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-4">
-                <div class="d-flex gap-3 align-items-start">
-                    <div class="step-number flex-shrink-0">1</div>
-                    <div>
-                        <h5 class="fw-bold mb-1" style="color:#0d2b4e;">Register Your Account</h5>
-                        <p class="text-muted small mb-0">Create your official TPF account using your service details. Accounts are verified by supervisors.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="d-flex gap-3 align-items-start">
-                    <div class="step-number flex-shrink-0">2</div>
-                    <div>
-                        <h5 class="fw-bold mb-1" style="color:#0d2b4e;">Enroll in Training</h5>
-                        <p class="text-muted small mb-0">Browse assigned or elective training modules and enroll. Access content from any device.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="d-flex gap-3 align-items-start">
-                    <div class="step-number flex-shrink-0">3</div>
-                    <div>
-                        <h5 class="fw-bold mb-1" style="color:#0d2b4e;">Complete &amp; Certify</h5>
-                        <p class="text-muted small mb-0">Complete modules, pass assessments, attend live briefings, and earn training records.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- FEATURES -->
-<section class="py-5" style="background:#f0f4f8;">
-    <div class="container py-3">
-        <div class="text-center mb-5">
-            <div class="section-label mb-2">Platform Capabilities</div>
-            <h2 class="fw-bold mb-2" style="color:#0d2b4e;">Everything Officers Need</h2>
-            <p class="text-muted" style="max-width:500px;margin:0 auto;">A complete professional development platform built for law enforcement.</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card">
-                    <div class="feature-icon-wrap" style="background:#eff6ff;">
-                        <i class="bi bi-journal-text" style="color:#1e5799;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Training Modules</h5>
-                    <p class="text-muted small mb-0">Structured law enforcement training — criminal law, procedures, ethics, community policing, and more.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card">
-                    <div class="feature-icon-wrap" style="background:#fef2f2;">
-                        <i class="bi bi-camera-video-fill" style="color:#dc2626;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Live Briefings</h5>
-                    <p class="text-muted small mb-0">Real-time HD video briefings and training sessions with screen sharing — no special equipment needed.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card">
-                    <div class="feature-icon-wrap" style="background:#f0fdf4;">
-                        <i class="bi bi-patch-check-fill" style="color:#16a34a;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Assessments &amp; Records</h5>
-                    <p class="text-muted small mb-0">Auto-graded tests, official training records, completion certificates, and performance tracking.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card">
-                    <div class="feature-icon-wrap" style="background:#fffbeb;">
-                        <i class="bi bi-people-fill" style="color:#d97706;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Force Communications</h5>
-                    <p class="text-muted small mb-0">Secure internal messaging, unit discussion boards, and collaboration tools for all personnel.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card">
-                    <div class="feature-icon-wrap" style="background:#eff6ff;">
-                        <i class="bi bi-shield-lock-fill" style="color:#0284c7;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Secure &amp; Official</h5>
-                    <p class="text-muted small mb-0">Role-based access control, encrypted data, and verified officer accounts. Your records stay private.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card">
-                    <div class="feature-icon-wrap" style="background:#faf5ff;">
-                        <i class="bi bi-phone-fill" style="color:#7c3aed;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Access Anywhere</h5>
-                    <p class="text-muted small mb-0">Fully mobile-responsive — train from the office, the field, or at home. Works on any device.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ROLES -->
-<section class="py-5 bg-white">
-    <div class="container py-3">
-        <div class="text-center mb-5">
-            <div class="section-label mb-2">Personnel Roles</div>
-            <h2 class="fw-bold mb-2" style="color:#0d2b4e;">Built for Every Rank</h2>
-            <p class="text-muted" style="max-width:480px;margin:0 auto;">The portal serves all TPF personnel — from recruits to administration.</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-sm-6 col-lg-3">
-                <div class="role-card">
-                    <div class="role-icon" style="background:#eff6ff;">
-                        <i class="bi bi-person-fill" style="color:#1e5799;font-size:1.8rem;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Officer / Recruit</h5>
-                    <p class="text-muted small mb-3">Enroll in training modules, attend live briefings, complete assessments, and view your records.</p>
-                    <span class="badge" style="background:#eff6ff;color:#1e5799;font-size:.75rem;">Default Role</span>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="role-card">
-                    <div class="role-icon" style="background:#f0fdf4;">
-                        <i class="bi bi-person-workspace" style="color:#16a34a;font-size:1.8rem;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Instructor</h5>
-                    <p class="text-muted small mb-3">Create and manage training modules, host live briefings, set assessments, and grade officers.</p>
-                    <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.75rem;">Assigned by Admin</span>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="role-card">
-                    <div class="role-icon" style="background:#fffbeb;">
-                        <i class="bi bi-shield-check" style="color:#d97706;font-size:1.8rem;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Supervisor</h5>
-                    <p class="text-muted small mb-3">Monitor officer training progress, manage user accounts, and oversee platform integrity.</p>
-                    <span class="badge" style="background:#fffbeb;color:#d97706;font-size:.75rem;">Assigned by Admin</span>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="role-card">
-                    <div class="role-icon" style="background:#fef2f2;">
-                        <i class="bi bi-gear-fill" style="color:#dc2626;font-size:1.8rem;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2" style="color:#0d2b4e;">Administrator</h5>
-                    <p class="text-muted small mb-3">Full system access — manage all personnel, roles, training content, and system configuration.</p>
-                    <span class="badge" style="background:#fef2f2;color:#dc2626;font-size:.75rem;">Highest Access</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA -->
-<section class="cta-section py-5">
-    <div class="container py-4 position-relative" style="z-index:1;">
-        <div class="row align-items-center">
-            <div class="col-lg-7 mb-4 mb-lg-0">
-                <h2 class="fw-bold text-white mb-2" style="font-size:2.2rem;">Ready to Begin Training?</h2>
-                <p class="mb-0" style="color:rgba(255,255,255,.75);font-size:1.05rem;">
-                    Sign in to the Tanzania Police Force Training Portal and continue your professional development.
-                </p>
-            </div>
-            <div class="col-lg-5 text-lg-end">
-                <a href="{% url 'account_login' %}" class="btn btn-light btn-lg fw-semibold px-4 me-2 shadow">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>Officer Login
-                </a>
-                <a href="{% url 'account_signup' %}" class="btn btn-outline-light btn-lg px-4">
-                    Register
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
 
 {% endblock %}
