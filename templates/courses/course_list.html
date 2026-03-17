@@ -1,25 +1,221 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}All Courses - Elening LMS{% endblock %}
+{% block title %}Course Catalog — Elening LMS{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --navy: #0d1f4e;
+        --navy-dark: #081535;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Book antiqua', sans-serif;
+        background: var(--bg) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    /* ── SHELL ── */
+    .dash-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    .dash-sidebar {
+        width: var(--sidebar-w);
+        background: var(--white);
+        border-right: 1px solid #d4dae8;
+        display: flex; flex-direction: column; flex-shrink: 0;
+        position: fixed; top: 0; left: 0; bottom: 0;
+        z-index: 100; overflow-y: auto;
+    }
+    .sidebar-brand {
+        padding: 20px 20px 16px;
+        border-bottom: 1px solid #d4dae8;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .sidebar-brand img { width: 60px; height: 60px; object-fit: contain; }
+    .sidebar-brand-name {
+        font-family: 'EB Garamond', serif;
+        font-size: .95rem; font-weight: 800; color: #1c236d;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        text-align: center; line-height: 1.3;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 11px 20px; color: #1c236d;
+        font-size: .9rem; font-weight: 500; text-decoration: none;
+        border-left: 3px solid transparent;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+    .nav-item:hover { background: #eef1f8; color: var(--navy); }
+    .nav-item.active { background: #eef1f8; color: var(--navy); font-weight: 700; border-left-color: var(--navy); }
+    .nav-item i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .sidebar-logout { border-top: 1px solid #d4dae8; padding: 14px 20px; }
+    /* ── MAIN ── */
+    .dash-main { margin-left: 0; flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+
+    /* Topbar */
+    .dash-topbar {
+        background: var(--white); border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px; display: flex; align-items: center;
+        justify-content: space-between; position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; }
+    .topbar-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { text-align: right; }
+    .user-info .name { font-weight: 700; font-size: .9rem; color: #1c236d; line-height: 1.2; }
+    .user-info .role { font-size: .77rem; color: #94a3b8; }
+
+    .role-pill {
+        display: inline-block; background: #16a34a; color: #fff;
+        font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+        text-transform: uppercase; border-radius: 100px;
+        padding: .18rem .65rem; margin-top: 3px;
+    }
+
+    .dash-content { padding: 24px 28px; flex: 1; }
+
+    .catalog-wrap { padding: 0; }
+
+    .catalog-banner{
+        background: #1c236d;
+        border-radius: 14px;
+        padding: 22px 24px;
+        color: #fff;
+        margin-bottom: 18px;
+        overflow: hidden;
+    }
+    .catalog-banner .label{
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.55);
+        margin-bottom: 6px;
+    }
+    .catalog-banner .title{
+        font-family: 'EB Garamond', serif;
+        font-size: 1.55rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .catalog-banner .subtitle{
+        margin-top: 8px;
+        margin-bottom: 0;
+        color: rgba(255,255,255,.75);
+        font-size: .92rem;
+    }
+
+    .catalog-card{
+        background: var(--white);
+        border: 1px solid #d4dae8;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .catalog-card .card-body{ padding: 18px; }
+
+    .catalog-filter-title{
+        font-family: 'EB Garamond', serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1c236d;
+        margin-bottom: 12px;
+    }
+
+    .catalog-course-card{
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #d4dae8 !important;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .catalog-course-card:hover{
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0,0,0,.1) !important;
+    }
+    .catalog-course-card .card-title{
+        color: #1c236d;
+        font-weight: 700;
+    }
+
+    .catalog-search .form-control{
+        border-radius: 12px 0 0 12px;
+        border-color: #d4dae8;
+        padding: .75rem 1rem;
+    }
+    .catalog-search .btn{
+        border-radius: 0 12px 12px 0;
+        padding: .75rem 1rem;
+        font-weight: 600;
+    }
+
+    .btn-outline-primary { color: #1c236d; border: 1px solid #b0bcd4; }
+    .btn-outline-primary:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state i { font-size: 4rem; color: #b0bcd4; margin-bottom: 16px; }
+    .empty-state h5 { color: #1c236d; font-weight: 700; margin-bottom: 8px; }
+    .empty-state p { color: #94a3b8; margin-bottom: 16px; }
+    .btn-primary { background: #1c236d; border-color: #1c236d; }
+    .btn-primary:hover { background: #081535; border-color: #081535; }
+
+    @media (max-width: 768px) {
+        .dash-sidebar { width: 220px; transform: translateX(-100%); transition: transform .25s; }
+        .dash-main { margin-left: 0; }
+        .dash-topbar { padding: 12px 16px; }
+        .dash-content { padding: 16px; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0"><i class="bi bi-book me-2 text-primary"></i>Courses</h2>
-        {% if user.is_authenticated and user.can_manage_courses %}
-        <a href="{% url 'courses:create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Create Course
-        </a>
-        {% endif %}
+<div class="dash-shell">
+    <!-- SIDEBAR -->
+    {% include 'partials/sidebar.html' %}
+
+    <!-- MAIN CONTENT -->
+    <div class="dash-main">
+        <!-- TOPBAR -->
+        <div class="dash-topbar">
+            <h1 class="topbar-title">Course Catalog</h1>
+            <div class="topbar-user">
+                <div class="user-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+                <div class="user-info">
+                    <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="role"><span class="role-pill">Student</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="dash-content">
+            <div class="catalog-wrap">
+    <div class="catalog-banner">
+        <div class="label">COURSE CATALOG</div>
+        <h2 class="title">Browse training modules</h2>
+        <p class="subtitle">Search, filter by category, and open a course to view details.</p>
     </div>
 
     <div class="row g-4">
         <!-- Filter Sidebar -->
         <div class="col-lg-3">
-            <div class="card border-0 shadow-sm">
+            <div class="catalog-card">
                 <div class="card-body">
-                    <h6 class="fw-bold mb-3">Filter by Category</h6>
+                    <div class="catalog-filter-title">Filter by category</div>
                     <div class="list-group list-group-flush">
                         <a href="{% url 'courses:list' %}" class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %} border-0 rounded mb-1">
                             All Courses
@@ -28,7 +224,6 @@
                         <a href="?category={{ cat.pk }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                            class="list-group-item list-group-item-action border-0 rounded mb-1 {% if selected_category == cat.pk|stringformat:'s' %}active{% endif %}">
                             {{ cat.name }}
-                            <span class="badge bg-secondary float-end">{{ cat.course_count }}</span>
                         </a>
                         {% endfor %}
                     </div>
@@ -39,7 +234,7 @@
         <!-- Course Grid -->
         <div class="col-lg-9">
             <!-- Search bar -->
-            <form method="GET" class="mb-4">
+            <form method="GET" class="mb-4 catalog-search">
                 {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
                 <div class="input-group">
                     <input type="search" class="form-control" name="q" placeholder="Search courses..."
@@ -54,7 +249,7 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                 {% for course in courses %}
                 <div class="col">
-                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                    <div class="card h-100 catalog-course-card">
                         {% if course.image_if_exists %}
                         <img src="{{ course.image_if_exists.url }}" class="card-img-top"
                              style="height:160px;object-fit:cover" alt="{{ course.fullname }}">
@@ -79,7 +274,7 @@
                             {% endif %}
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <small class="text-muted">
-                                    <i class="bi bi-people me-1"></i>{{ course.enrolled_count }} students
+                                    <i class="bi bi-people me-1"></i>{{ course.student_count|default:"0" }} students
                                 </small>
                                 {% if course.price > 0 %}
                                 <span class="badge bg-success">${{ course.price }}</span>
@@ -129,6 +324,9 @@
                 <a href="{% url 'courses:list' %}" class="btn btn-primary">Clear Filters</a>
             </div>
             {% endif %}
+        </div>
+    </div>
+            </div>
         </div>
     </div>
 </div>

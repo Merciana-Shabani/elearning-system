@@ -1,62 +1,206 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}My Training — Selected courses{% endblock %}
 
-{% block content %}
-<div class="container py-4">
-    <h2 class="fw-bold mb-4"><i class="bi bi-collection me-2 text-primary"></i>My Training / selected courses</h2>
-    <p class="text-muted mb-4">Your enrolled training. Access content or close a course when done.</p>
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
 
-    {% if enrollments %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% for enrollment in enrollments %}
-        <div class="col">
-            <div class="card h-100 border-0 shadow-sm">
-                {% if enrollment.course.image_if_exists %}
-                <img src="{{ enrollment.course.image_if_exists.url }}" class="card-img-top"
-                     style="height:150px;object-fit:cover" alt="{{ enrollment.course.fullname }}">
-                {% else %}
-                <div class="bg-primary d-flex align-items-center justify-content-center"
-                     style="height:150px">
-                    <i class="bi bi-book text-white" style="font-size:3rem"></i>
-                </div>
-                {% endif %}
-                <div class="card-body">
-                    <h6 class="fw-bold mb-1">{{ enrollment.course.fullname }}</h6>
-                    {% if enrollment.course.teacher %}
-                    <small class="text-muted d-block mb-2">
-                        <i class="bi bi-person me-1"></i>{{ enrollment.course.teacher.get_full_name }}
-                    </small>
-                    {% endif %}
-                    <small class="text-muted">Enrolled {{ enrollment.enrolled_at|date:"M d, Y" }}</small>
-                </div>
-                <div class="card-footer bg-white border-0 pb-3">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{% url 'courses:content' pk=enrollment.course.pk %}"
-                           class="btn btn-primary btn-sm">
-                            <i class="bi bi-play-circle me-1"></i>Access training
-                        </a>
-                        <a href="{% url 'grades:gradebook' course_pk=enrollment.course.pk %}"
-                           class="btn btn-outline-secondary btn-sm" title="Gradebook">
-                            <i class="bi bi-bar-chart"></i>
-                        </a>
-                        <a href="{% url 'enrollment:unenroll' course_pk=enrollment.course.pk %}"
-                           class="btn btn-outline-danger btn-sm">
-                            Close course
-                        </a>
-                    </div>
+    :root {
+        --navy: #0d1f4e;
+        --navy-dark: #081535;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Book antiqua', sans-serif;
+        background: var(--bg) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    /* ── SHELL ── */
+    .dash-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    /* ── SIDEBAR ── */
+    .dash-sidebar {
+        width: var(--sidebar-w);
+        background: var(--white);
+        border-right: 1px solid #d4dae8;
+        display: flex; flex-direction: column; flex-shrink: 0;
+        position: fixed; top: 0; left: 0; bottom: 0;
+        z-index: 100; overflow-y: auto;
+    }
+    .sidebar-brand {
+        padding: 20px 20px 16px;
+        border-bottom: 1px solid #d4dae8;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .sidebar-brand img { width: 60px; height: 60px; object-fit: contain; }
+    .sidebar-brand-name {
+        font-family: 'EB Garamond', serif;
+        font-size: .95rem; font-weight: 800; color: #1c236d;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        text-align: center; line-height: 1.3;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 11px 20px; color: #1c236d;
+        font-size: .9rem; font-weight: 500; text-decoration: none;
+        border-left: 3px solid transparent;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+    .nav-item:hover { background: #eef1f8; color: var(--navy); }
+    .nav-item.active { background: #eef1f8; color: var(--navy); font-weight: 700; border-left-color: var(--navy); }
+    .nav-item i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-badge {
+        margin-left: auto; background: #dc2626; color: #fff;
+        font-size: .65rem; font-weight: 700;
+        min-width: 18px; height: 18px; border-radius: 100px;
+        display: flex; align-items: center; justify-content: center; padding: 0 5px;
+    }
+    .sidebar-logout { border-top: 1px solid #d4dae8; padding: 14px 20px; }
+    /* ── MAIN ── */
+    .dash-main { margin-left: 0; flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+
+    /* Topbar */
+    .dash-topbar {
+        background: var(--white); border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px; display: flex; align-items: center;
+        justify-content: space-between; position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; }
+    .topbar-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { text-align: right; }
+    .user-info .name { font-weight: 700; font-size: .9rem; color: #1c236d; line-height: 1.2; }
+    .user-info .role { font-size: .77rem; color: #94a3b8; }
+
+    /* Role badge */
+    .role-pill {
+        display: inline-block; background: #16a34a; color: #fff;
+        font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+        text-transform: uppercase; border-radius: 100px;
+        padding: .18rem .65rem; margin-top: 3px;
+    }
+
+    /* Content */
+    .dash-content { padding: 24px 28px; flex: 1; }
+
+    /* ── Cards grid ── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .course-card { 
+        background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; 
+        overflow: hidden; transition: transform .2s, box-shadow .2s;
+    }
+    .course-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,.1); }
+    .course-card-img { height: 160px; object-fit: cover; background: #1c236d; }
+    .course-card-body { padding: 18px; }
+    .course-card-title { font-weight: 700; font-size: .95rem; color: #1c236d; margin-bottom: 6px; }
+    .course-card-sub { font-size: .78rem; color: #94a3b8; margin-bottom: 12px; }
+    .course-card-footer { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn-sm-custom {
+        padding: .35rem .75rem; font-size: .75rem; font-weight: 600;
+        border: 1px solid #b0bcd4; border-radius: 8px;
+        color: #1c236d; background: #fff; text-decoration: none;
+        transition: background .15s;
+    }
+    .btn-sm-custom:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+    .btn-sm-custom.primary { background: #1c236d; color: #fff; border-color: #1c236d; }
+    .btn-sm-custom.primary:hover { opacity: .88; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state i { font-size: 4rem; color: #b0bcd4; margin-bottom: 16px; }
+    .empty-state h4 { color: #1c236d; font-weight: 700; margin-bottom: 8px; }
+    .empty-state p { color: #94a3b8; margin-bottom: 16px; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .dash-sidebar { width: 220px; transform: translateX(-100%); transition: transform .25s; }
+        .dash-sidebar.open { transform: translateX(0); }
+        .dash-main { margin-left: 0; }
+        .dash-topbar { padding: 12px 16px; }
+        .dash-content { padding: 16px; }
+        .card-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-shell">
+    <!-- SIDEBAR -->
+    {% include 'partials/sidebar.html' %}
+
+    <!-- MAIN CONTENT -->
+    <div class="dash-main">
+        <!-- TOPBAR -->
+        <div class="dash-topbar">
+            <h1 class="topbar-title">My Training</h1>
+            <div class="topbar-user">
+                <div class="user-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+                <div class="user-info">
+                    <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="role"><span class="role-pill">Student</span></div>
                 </div>
             </div>
         </div>
-        {% endfor %}
+
+        <!-- CONTENT -->
+        <div class="dash-content">
+            {% if enrollments %}
+            <div class="card-grid">
+                {% for enrollment in enrollments %}
+                <div class="course-card">
+                    {% if enrollment.course.image_if_exists %}
+                    <img src="{{ enrollment.course.image_if_exists.url }}" class="course-card-img" alt="">
+                    {% else %}
+                    <div class="course-card-img d-flex align-items-center justify-content-center">
+                        <i class="bi bi-book text-white" style="font-size:2rem"></i>
+                    </div>
+                    {% endif %}
+                    <div class="course-card-body">
+                        <div class="course-card-title">{{ enrollment.course.fullname }}</div>
+                        {% if enrollment.course.teacher %}
+                        <div class="course-card-sub"><i class="bi bi-person me-1"></i>{{ enrollment.course.teacher.get_full_name }}</div>
+                        {% endif %}
+                        <div class="course-card-sub">Enrolled {{ enrollment.enrolled_at|date:"M d, Y" }}</div>
+                        <div class="course-card-footer">
+                            <a href="{% url 'courses:content' pk=enrollment.course.pk %}" class="btn-sm-custom primary">
+                                <i class="bi bi-play-circle me-1"></i>Access
+                            </a>
+                            <a href="{% url 'grades:gradebook' course_pk=enrollment.course.pk %}" class="btn-sm-custom" title="Gradebook">
+                                <i class="bi bi-bar-chart"></i>Grades
+                            </a>
+                            <a href="{% url 'enrollment:unenroll' course_pk=enrollment.course.pk %}" class="btn-sm-custom" style="color: #dc2626;">
+                                <i class="bi bi-x"></i>Close
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-collection"></i>
+                <h4>No training selected yet</h4>
+                <p>Enroll in a course to add it here. You can browse new materials from your dashboard.</p>
+                <a href="{% url 'courses:list' %}" class="btn-sm-custom primary" style="display: inline-block; padding: .5rem 1.5rem; font-size: .88rem;">Browse courses</a>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-collection text-muted" style="font-size:5rem"></i>
-        <h4 class="mt-3">No training selected yet</h4>
-        <p class="text-muted">Enroll in a course to add it here. You can browse new materials from your dashboard.</p>
-        <a href="{% url 'courses:list' %}" class="btn btn-primary btn-lg">Browse courses</a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

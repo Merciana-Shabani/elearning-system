@@ -1,93 +1,253 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}All Courses — Elening LMS{% endblock %}
 
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --navy: #0d1f4e;
+        --navy-dark: #081535;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Book antiqua', sans-serif;
+        background: var(--bg) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    /* ── SHELL ── */
+    .dash-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    .dash-sidebar {
+        width: var(--sidebar-w);
+        background: var(--white);
+        border-right: 1px solid #d4dae8;
+        display: flex; flex-direction: column; flex-shrink: 0;
+        position: fixed; top: 0; left: 0; bottom: 0;
+        z-index: 100; overflow-y: auto;
+    }
+    .sidebar-brand {
+        padding: 20px 20px 16px;
+        border-bottom: 1px solid #d4dae8;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .sidebar-brand img { width: 60px; height: 60px; object-fit: contain; }
+    .sidebar-brand-name {
+        font-family: 'EB Garamond', serif;
+        font-size: .95rem; font-weight: 800; color: #1c236d;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        text-align: center; line-height: 1.3;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 11px 20px; color: #1c236d;
+        font-size: .9rem; font-weight: 500; text-decoration: none;
+        border-left: 3px solid transparent;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+    .nav-item:hover { background: #eef1f8; color: var(--navy); }
+    .nav-item.active { background: #eef1f8; color: var(--navy); font-weight: 700; border-left-color: var(--navy); }
+    .nav-item i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .sidebar-logout { border-top: 1px solid #d4dae8; padding: 14px 20px; }
+    /* ── MAIN ── */
+    .dash-main { margin-left: 0; flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+
+    /* Topbar */
+    .dash-topbar {
+        background: var(--white); border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px; display: flex; align-items: center;
+        justify-content: space-between; position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; }
+    .topbar-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { text-align: right; }
+    .user-info .name { font-weight: 700; font-size: .9rem; color: #1c236d; line-height: 1.2; }
+    .user-info .role { font-size: .77rem; color: #94a3b8; }
+
+    .role-pill {
+        display: inline-block; background: #16a34a; color: #fff;
+        font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+        text-transform: uppercase; border-radius: 100px;
+        padding: .18rem .65rem; margin-top: 3px;
+    }
+
+    .dash-content { padding: 24px 28px; flex: 1; }
+
+    .info-card { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; overflow: hidden; margin-bottom: 24px; }
+    .info-card-header {
+        padding: 14px 18px; border-bottom: 1px solid #eef1f8;
+        display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .info-card-header h6 { font-weight: 700; font-size: .92rem; color: #1c236d; margin: 0; }
+    .info-card-body { padding: 0; }
+
+    .table-responsive { margin-bottom: 0; }
+    .table { margin-bottom: 0; font-size: .88rem; }
+    .table thead th { background: #f8f9fa; color: #1c236d; font-weight: 700; font-size: .85rem; border: none; padding: 12px 16px; }
+    .table tbody td { padding: 12px 16px; border: none; border-bottom: 1px solid #eef1f8; vertical-align: middle; }
+    .table tbody tr:hover { background: #f8f9fa; }
+
+    .badge { font-size: .7rem; font-weight: 700; }
+    .badge.bg-success { background: #16a34a !important; }
+    .badge.bg-info { background: #0ea5e9 !important; }
+    .badge.bg-danger { background: #dc2626 !important; }
+    .badge.bg-warning { background: #eab308 !important; color: #000 !important; }
+    .badge.bg-secondary { background: #6b7280 !important; }
+
+    .btn-sm { font-size: .75rem; font-weight: 600; padding: .3rem .65rem; border-radius: 8px; }
+    .btn-outline-success { color: #16a34a; border: 1px solid #86efac; }
+    .btn-outline-success:hover { background: #16a34a; color: #fff; }
+    .btn-outline-primary { color: #1c236d; border: 1px solid #b0bcd4; }
+    .btn-outline-primary:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+    .btn-outline-secondary { color: #6b7280; border: 1px solid #d1d5db; }
+    .btn-outline-secondary:hover { background: #6b7280; color: #fff; }
+    .btn-outline-danger { color: #dc2626; border: 1px solid #fca5a5; }
+    .btn-outline-danger:hover { background: #dc2626; color: #fff; }
+
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state i { font-size: 4rem; color: #b0bcd4; margin-bottom: 16px; }
+    .empty-state h5 { color: #1c236d; font-weight: 700; margin-bottom: 8px; }
+    .empty-state p { color: #94a3b8; margin-bottom: 16px; }
+    .btn-primary { background: #1c236d; border-color: #1c236d; }
+    .btn-primary:hover { background: #081535; border-color: #081535; }
+
+    @media (max-width: 768px) {
+        .dash-sidebar { width: 220px; transform: translateX(-100%); transition: transform .25s; }
+        .dash-main { margin-left: 0; }
+        .dash-topbar { padding: 12px 16px; }
+        .dash-content { padding: 16px; }
+        .info-card-header { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <div>
-            <h2 class="fw-bold mb-0"><i class="bi bi-collection me-2 text-primary"></i>All Courses</h2>
-            <p class="text-muted mb-0">All courses on the platform. You can manage your own; others are view-only.</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{% url 'courses:teaching' %}" class="btn btn-outline-primary">
-                <i class="bi bi-person-badge me-2"></i>My courses
-            </a>
-            <a href="{% url 'courses:create' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Create Course
-            </a>
-        </div>
-    </div>
+<div class="dash-shell">
+    <!-- SIDEBAR -->
+    {% include 'partials/sidebar.html' %}
 
-    {% if courses %}
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
-            <table class="table mb-0 align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Course name</th>
-                        <th>Short name</th>
-                        <th>Status</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for course in courses %}
-                    <tr>
-                        <td class="fw-semibold">{{ course.fullname }}</td>
-                        <td class="text-muted">{{ course.shortname }}</td>
-                        <td>
-                            <span class="badge {% if course.status == 'published' %}bg-success{% elif course.status == 'submitted' %}bg-info{% elif course.status == 'rejected' %}bg-danger{% elif course.status == 'needs_revision' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
-                                {{ course.get_status_display }}
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            {% if course.teacher_id == user.pk %}
-                            <div class="btn-group btn-group-sm" role="group">
-                                {% if course.status == 'draft' or course.status == 'rejected' %}
-                                <a class="btn btn-outline-success" href="{% url 'courses:submit_for_approval' pk=course.pk %}">
-                                    Submit for approval
-                                </a>
-                                {% endif %}
-                                <a class="btn btn-outline-primary" href="{% url 'courses:content' pk=course.pk %}">Content</a>
-                                <a class="btn btn-outline-primary" href="{% url 'courses:announcements_list' pk=course.pk %}">Announcements</a>
-                                <a class="btn btn-outline-primary" href="{% url 'courses:analytics' pk=course.pk %}">Analytics</a>
-                                <a class="btn btn-outline-primary" href="{% url 'courses:certificates' pk=course.pk %}">Certificates</a>
-                                <a class="btn btn-outline-primary" href="{% url 'courses:export_reports' pk=course.pk %}">Export</a>
-                                <a class="btn btn-outline-secondary" href="{% url 'courses:edit' pk=course.pk %}">Edit</a>
-                                <a class="btn btn-outline-danger" href="{% url 'courses:delete' pk=course.pk %}">Delete</a>
-                            </div>
-                            {% else %}
-                            <a class="btn btn-outline-primary btn-sm" href="{% url 'courses:detail' pk=course.pk %}">View</a>
-                            {% endif %}
-                        </td>
-                    </tr>
+    <!-- MAIN CONTENT -->
+    <div class="dash-main">
+        <!-- TOPBAR -->
+        <div class="dash-topbar">
+            <h1 class="topbar-title">All Courses</h1>
+            <div class="topbar-user">
+                <div class="user-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+                <div class="user-info">
+                    <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="role"><span class="role-pill">Student</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="dash-content">
+
+            {% if courses %}
+            <div class="info-card">
+                <div class="info-card-header">
+                    <h6>Available Courses</h6>
+                    <div style="display: flex; gap: 8px; flex-grow: 1; justify-content: flex-end; flex-wrap: wrap;">
+                        <a href="{% url 'courses:teaching' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-person-badge"></i> My courses
+                        </a>
+                        <a href="{% url 'courses:create' %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i> Create
+                        </a>
+                    </div>
+                </div>
+                <div class="info-card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Course name</th>
+                                    <th>Short name</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses %}
+                                <tr>
+                                    <td class="fw-semibold">{{ course.fullname }}</td>
+                                    <td class="text-muted">{{ course.shortname }}</td>
+                                    <td>
+                                        <span class="badge {% if course.status == 'published' %}bg-success{% elif course.status == 'submitted' %}bg-info{% elif course.status == 'rejected' %}bg-danger{% elif course.status == 'needs_revision' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                            {{ course.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        {% if course.teacher_id == user.pk %}
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            {% if course.status == 'draft' or course.status == 'rejected' %}
+                                            <a class="btn btn-outline-success" href="{% url 'courses:submit_for_approval' pk=course.pk %}">
+                                                Submit for approval
+                                            </a>
+                                            {% endif %}
+                                            <a class="btn btn-outline-primary" href="{% url 'courses:content' pk=course.pk %}">Content</a>
+                                            <a class="btn btn-outline-primary" href="{% url 'courses:announcements_list' pk=course.pk %}">Announcements</a>
+                                            <a class="btn btn-outline-primary" href="{% url 'courses:analytics' pk=course.pk %}">Analytics</a>
+                                            <a class="btn btn-outline-primary" href="{% url 'courses:certificates' pk=course.pk %}">Certificates</a>
+                                            <a class="btn btn-outline-primary" href="{% url 'courses:export_reports' pk=course.pk %}">Export</a>
+                                            <a class="btn btn-outline-secondary" href="{% url 'courses:edit' pk=course.pk %}">Edit</a>
+                                            <a class="btn btn-outline-danger" href="{% url 'courses:delete' pk=course.pk %}">Delete</a>
+                                        </div>
+                                        {% else %}
+                                        <a class="btn btn-outline-primary btn-sm" href="{% url 'courses:detail' pk=course.pk %}">View</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <nav class="mt-3" aria-label="Course pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if num == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
                     {% endfor %}
-                </tbody>
-            </table>
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right"></i></a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-collection"></i>
+                <h5>No courses in the system yet</h5>
+                <p>Courses will appear here when they are created by instructors.</p>
+                <a href="{% url 'enrollment:my_courses' %}" class="btn btn-primary" style="display: inline-block; padding: .5rem 1.5rem;">
+                    My Courses
+                </a>
+            </div>
+            {% endif %}
         </div>
     </div>
-
-    {% if page_obj.has_other_pages %}
-    <nav class="mt-3" aria-label="Course pagination">
-        <ul class="pagination justify-content-center mb-0">
-            {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a></li>
-            {% endif %}
-            {% for num in page_obj.paginator.page_range %}
-            <li class="page-item {% if num == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-            {% endfor %}
-            {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right"></i></a></li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
-    {% else %}
-    <div class="text-center py-5">
-        <p class="text-muted mb-0">No courses in the system yet.</p>
-        <a href="{% url 'courses:teaching' %}" class="btn btn-outline-primary mt-2">My courses</a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

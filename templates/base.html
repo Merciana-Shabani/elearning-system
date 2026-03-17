@@ -15,67 +15,25 @@
 
     <style>
         .global-sidebar {
-            width: 220px;
-            min-width: 220px;
+            width: 230px;
+            min-width: 230px;
             position: sticky;
             top: 0;
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
             scrollbar-width: thin;
-            scrollbar-color: rgba(0,0,0,.2) transparent;
-            background: #ffffff;
-            border-right: 1px solid #e9ecef;
+            scrollbar-color: rgba(255,255,255,.2) transparent;
         }
         .global-sidebar::-webkit-scrollbar { width: 4px; }
-        .global-sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,.2); border-radius: 4px; }
-
-        .global-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            padding: .85rem 1.2rem;
-            border-radius: 0;
-            color: #2c3e50;
-            text-decoration: none;
-            font-size: .95rem;
-            font-weight: 500;
-            transition: background .15s, color .15s;
-            margin: 0;
-            border-left: 0;
-        }
-        .global-sidebar .sidebar-link:hover {
-            background: #f8f9fa;
-            color: #0a054d;
-        }
-        .global-sidebar .sidebar-link.active {
-            background: #0a054d;
-            color: #ffffff;
-            border-left: 0;
-            font-weight: 600;
-            margin: 0;
-        }
-        .global-sidebar .sidebar-link.active i { color: #ffffff !important; }
-        .global-sidebar .sidebar-link i {
-            color: #0a054d;
-            font-size: 1.15rem;
-            width: 24px;
-        }
-        .global-sidebar .sidebar-section-label {
-            font-size: .7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .8px;
-            color: #6c757d;
-            padding: 1.2rem 1.2rem .5rem;
-            margin-top: .8rem;
-        }
+        .global-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 4px; }
         .sidebar-avatar-initials {
-            width: 40px; height: 40px;
-            font-size: .8rem; font-weight: 700;
+            width: 36px; height: 36px;
+            font-size: .72rem; font-weight: 700;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
-            background: #0a054d;
+            background: rgba(255,255,255,.15);
             color: #fff;
         }
     </style>
@@ -92,13 +50,32 @@
 
         {% if user.is_authenticated %}
         <!-- Global Persistent Sidebar -->
-        <nav id="globalSidebar" class="global-sidebar bg-white border-end d-none d-lg-flex flex-column shadow-sm flex-shrink-0">
+        <nav id="globalSidebar" class="global-sidebar bg-white border-end d-flex flex-column shadow-sm flex-shrink-0">
 
-            <!-- Sidebar brand for students / global -->
-            <div class="p-3 border-bottom text-center" style="background: #ffffff;">
-                <img src="{% static 'img/tpf_logo.png' %}" alt="TPF Logo" style="height:50px;object-fit:contain;">
-                <div class="fw-bold mt-3" style="font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:#0a054d;">
-                    TPF E‑LEARNING
+            <!-- Mini profile -->
+            <div class="p-3 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" class="rounded-circle flex-shrink-0"
+                         width="36" height="36" style="object-fit:cover;" alt="Avatar">
+                    {% else %}
+                    <div class="sidebar-avatar-initials bg-primary text-white">
+                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                    </div>
+                    {% endif %}
+                    <div style="min-width:0;">
+                        <div class="fw-semibold text-truncate" style="font-size:.83rem;max-width:155px;">
+                            {{ user.get_full_name|default:user.username }}
+                        </div>
+                        <span class="badge
+                            {% if user.is_admin_role %}bg-danger
+                            {% elif user.is_moderator %}bg-warning text-dark
+                            {% elif user.is_instructor %}bg-success
+                            {% else %}bg-primary{% endif %}"
+                            style="font-size:.62rem;">
+                            {{ user.get_role_display }}
+                        </span>
+                    </div>
                 </div>
             </div>
 
@@ -106,38 +83,38 @@
             <div class="p-2 flex-grow-1">
 
                 {% if user.is_moderator %}
-                <a href="{% url 'moderation:dashboard' %}" class="sidebar-link {% if request.resolver_match.app_name == 'moderation' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <a href="{% url 'moderation:dashboard' %}" class="sidebar-link">
                     <i class="bi bi-shield-check me-2"></i>Moderation Dashboard
                 </a>
                 <div class="sidebar-section-label">Queues</div>
-                <a href="{% url 'courses:pending_approval' %}" class="sidebar-link {% if request.resolver_match.url_name == 'pending_approval' %}active{% endif %}">
+                <a href="{% url 'courses:pending_approval' %}" class="sidebar-link">
                     <i class="bi bi-check2-square me-2 text-warning"></i>Pending course reviews
                 </a>
-                <a href="{% url 'moderation:reports' %}" class="sidebar-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
+                <a href="{% url 'moderation:reports' %}" class="sidebar-link">
                     <i class="bi bi-flag me-2 text-warning"></i>Flagged content
                 </a>
-                <a href="{% url 'moderation:disputes' %}" class="sidebar-link {% if request.resolver_match.url_name == 'disputes' %}active{% endif %}">
+                <a href="{% url 'moderation:disputes' %}" class="sidebar-link">
                     <i class="bi bi-exclamation-diamond me-2 text-warning"></i>Disputes
                 </a>
 
                 <div class="sidebar-section-label">Management</div>
-                <a href="{% url 'users:list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'list' and 'users' in request.resolver_match.app_names %}active{% endif %}">
+                <a href="{% url 'users:list' %}" class="sidebar-link">
                     <i class="bi bi-people me-2"></i>Users
                 </a>
-                <a href="{% url 'courses:categories_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'categories_manage' %}active{% endif %}">
+                <a href="{% url 'courses:categories_manage' %}" class="sidebar-link">
                     <i class="bi bi-tags me-2"></i>Course categories
                 </a>
                 <div class="sidebar-section-label">Teaching</div>
-                <a href="{% url 'courses:teaching' %}" class="sidebar-link {% if request.resolver_match.url_name == 'teaching' %}active{% endif %}">
+                <a href="{% url 'courses:teaching' %}" class="sidebar-link {% if request.resolver_match.view_name == 'courses:teaching' %}active{% endif %}">
                     <i class="bi bi-book me-2"></i>Courses
                 </a>
-                <a href="{% url 'conferences:list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'conferences' %}active{% endif %}">
+                <a href="{% url 'conferences:list' %}" class="sidebar-link {% if request.resolver_match.namespace == 'conferences' %}active{% endif %}">
                     <i class="bi bi-camera-video me-2"></i>Live meeting
                 </a>
-                <a href="{% url 'quizzes:list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'quizzes' %}active{% endif %}">
+                <a href="{% url 'quizzes:list' %}" class="sidebar-link {% if request.resolver_match.namespace == 'quizzes' %}active{% endif %}">
                     <i class="bi bi-patch-question me-2"></i>Quiz
                 </a>
-                <a href="{% url 'enrollment:study_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'study_list' %}active{% endif %}">
+                <a href="{% url 'enrollment:study_list' %}" class="sidebar-link {% if request.resolver_match.view_name == 'enrollment:study_list' %}active{% endif %}">
                     <i class="bi bi-bookmark-star me-2"></i>Study list
                 </a>
                 {% if user.is_admin_role or user.is_staff %}
@@ -158,23 +135,23 @@
                 <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <i class="bi bi-grid me-2"></i>Dashboard
                 </a>
-                <a href="{% url 'courses:teaching' %}" class="sidebar-link {% if request.resolver_match.url_name == 'teaching' %}active{% endif %}">
+                <a href="{% url 'courses:teaching' %}" class="sidebar-link">
                     <i class="bi bi-book me-2"></i>Courses
                 </a>
-                <a href="{% url 'conferences:list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'conferences' %}active{% endif %}">
+                <a href="{% url 'conferences:list' %}" class="sidebar-link">
                     <i class="bi bi-camera-video me-2"></i>Live meeting
                 </a>
-                <a href="{% url 'quizzes:list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'quizzes' %}active{% endif %}">
+                <a href="{% url 'quizzes:list' %}" class="sidebar-link">
                     <i class="bi bi-patch-question me-2"></i>Quiz
                 </a>
-                <a href="{% url 'enrollment:study_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'study_list' %}active{% endif %}">
+                <a href="{% url 'enrollment:study_list' %}" class="sidebar-link">
                     <i class="bi bi-bookmark-star me-2"></i>Study list
                 </a>
                 <div class="sidebar-section-label">Account</div>
-                <a href="{% url 'users:profile' pk=user.pk %}" class="sidebar-link">
+                <a href="{% url 'users:profile' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.view_name == 'users:profile' %}active{% endif %}">
                     <i class="bi bi-person me-2"></i>Profile
                 </a>
-                <a href="{% url 'users:edit_profile' %}" class="sidebar-link">
+                <a href="{% url 'users:edit_profile' %}" class="sidebar-link {% if request.resolver_match.view_name == 'users:edit_profile' %}active{% endif %}">
                     <i class="bi bi-gear me-2"></i>Settings
                 </a>
 
@@ -182,26 +159,36 @@
                 <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <i class="bi bi-grid me-2"></i>Dashboard
                 </a>
-                <a href="{% url 'enrollment:my_courses' %}" class="sidebar-link {% if request.resolver_match.url_name == 'my_courses' %}active{% endif %}">
+                <a href="{% url 'enrollment:my_courses' %}" class="sidebar-link {% if request.resolver_match.namespace == 'enrollment' and request.resolver_match.url_name == 'my_courses' %}active{% endif %}">
                     <i class="bi bi-mortarboard-fill me-2"></i>My Courses / Trainings
                 </a>
-                <a href="{% url 'conferences:list' %}" class="sidebar-link d-flex align-items-center justify-content-between {% if request.resolver_match.app_name == 'conferences' %}active{% endif %}">
+                <a href="{% url 'conferences:list' %}" class="sidebar-link d-flex align-items-center justify-content-between {% if request.resolver_match.namespace == 'conferences' %}active{% endif %}">
                     <span><i class="bi bi-camera-video me-2"></i>Live Sessions</span>
                     {% if upcoming_conferences_count %}
                     <span class="badge bg-danger rounded-pill ms-2">{{ upcoming_conferences_count }}</span>
                     {% endif %}
                 </a>
-                <a href="{% url 'courses:list' %}" class="sidebar-link d-flex align-items-center justify-content-between {% if request.resolver_match.app_name == 'courses' and request.resolver_match.url_name == 'list' %}active{% endif %}">
-                    <span><i class="bi bi-folder2-open me-2"></i>New Materials</span>
-                    {% if new_courses %}
-                    <span class="badge bg-primary rounded-pill ms-2">{{ new_courses|length }}</span>
-                    {% endif %}
-                </a>
-                <a href="{% url 'enrollment:assignments_done' %}" class="sidebar-link {% if request.resolver_match.url_name == 'assignments_done' %}active{% endif %}">
+                <a href="{% url 'enrollment:assignments_done' %}" class="sidebar-link {% if request.resolver_match.namespace == 'enrollment' and request.resolver_match.url_name == 'assignments_done' %}active{% endif %}">
                     <i class="bi bi-graph-up-arrow me-2"></i>Progress Tracking
                 </a>
-                <a href="{% url 'enrollment:my_courses' %}" class="sidebar-link">
-                    <i class="bi bi-award me-2"></i>Certificates
+                <a href="{% url 'enrollment:study_list' %}" class="sidebar-link {% if request.resolver_match.namespace == 'enrollment' and request.resolver_match.url_name == 'study_list' %}active{% endif %}">
+                    <i class="bi bi-bookmark-star me-2"></i>Study List
+                </a>
+                <a href="{% url 'quizzes:list' %}" class="sidebar-link {% if request.resolver_match.namespace == 'quizzes' %}active{% endif %}">
+                    <i class="bi bi-patch-question me-2"></i>Quizzes
+                </a>
+                <a href="{% url 'courses:list' %}" class="sidebar-link d-flex align-items-center justify-content-between {% if request.resolver_match.namespace == 'courses' and request.resolver_match.url_name == 'list' %}active{% endif %}">
+                    <span><i class="bi bi-book me-2"></i>Course Catalog</span>
+                    {% if new_courses %}
+                    <span class="badge bg-secondary rounded-pill ms-2">{{ new_courses|length }}</span>
+                    {% endif %}
+                </a>
+                <div class="sidebar-section-label">Account</div>
+                <a href="{% url 'users:profile' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.view_name == 'users:profile' %}active{% endif %}">
+                    <i class="bi bi-person me-2"></i>My Profile
+                </a>
+                <a href="{% url 'users:edit_profile' %}" class="sidebar-link {% if request.resolver_match.view_name == 'users:edit_profile' %}active{% endif %}">
+                    <i class="bi bi-gear me-2"></i>Settings
                 </a>
                 {% endif %}
 
@@ -211,7 +198,7 @@
             <div class="p-2 border-top">
                 <form method="post" action="{% url 'account_logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="sidebar-link w-100 border-0 bg-transparent text-start" style="color: #dc3545 !important;">
+                    <button type="submit" class="sidebar-link w-100 border-0 bg-transparent text-danger text-start">
                         <i class="bi bi-box-arrow-right me-2"></i>Sign Out
                     </button>
                 </form>
