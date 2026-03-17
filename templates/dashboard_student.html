@@ -1,801 +1,241 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}Dashboard — TPF E-Learning{% endblock %}
+{% block title %}My Dashboard — Elening LMS{% endblock %}
 
 {% block extra_css %}
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
-
-    :root {
-        --navy: #0d1f4e;
-        --navy-dark: #081535;
-        --navy-mid: #163d6e;
-        --gold: #c8a84b;
-        --bg: #e8eef7;
-        --sidebar-w: 240px;
-        --white: #ffffff;
-    }
-
-    /* ── RESET — hide base.html navbar, kill gap ── */
-    body {
-        font-family: 'Book antiqua', sans-serif;
-        background: var(--bg) !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* Hide the base.html top navbar on dashboard */
-    nav.navbar, .navbar, body > nav, .tpf-top-header {
-        display: none !important;
-    }
-
-    /* Remove padding-top added for sticky navbar */
-    body, main, #main-content, [role="main"], .container-fluid {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
-
-    /* ── LAYOUT SHELL ── */
-    .dash-shell {
-        display: flex;
+    .student-dash-wrap {
+        background-color: #f2f6ff;
+        padding: 0;
         min-height: 100vh;
-        background: var(--bg);
-        position: fixed;
-        inset: 0;
-        overflow: hidden;
     }
 
-    /* ══════════════════════════
-       SIDEBAR
-    ══════════════════════════ */
-    .dash-sidebar {
-        width: var(--sidebar-w);
-        background: var(--white);
-        border-right: 1px solid #d4dae8;
-        display: flex;
-        flex-direction: column;
-        flex-shrink: 0;
-        position: fixed;
-        top: 0; left: 0; bottom: 0;
-        z-index: 100;
-        overflow-y: auto;
-    }
-
-    .sidebar-brand {
-        padding: 20px 20px 16px;
-        border-bottom: 1px solid #d4dae8;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .sidebar-brand img {
-        width: 60px; height: 60px;
-        object-fit: contain;
-    }
-
-    .sidebar-brand-name {
-        font-family: 'EB Garamond', serif;
-        font-size: .95rem;
-        font-weight: 800;
-        color: #1c236d;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        text-align: center;
-        line-height: 1.3;
-    }
-
-    .sidebar-nav {
-        flex: 1;
-        color:#1c236d;
-        padding: 12px 0;
-    }
-
-    .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 11px 20px;
-        color: #1c236d;
-        font-size: .9rem;
-        font-weight: 500;
-        text-decoration: none;
-        border-left: 3px solid transparent;
-        transition: background .15s, color .15s, border-color .15s;
-        position: relative;
-    }
-    .nav-item:hover {
-        background: #eef1f8;
-        color: var(--navy);
-    }
-    .nav-item.active {
-        background: #eef1f8;
-        color: var(--navy);
-        font-weight: 700;
-        border-left-color: var(--navy);
-    }
-    .nav-item i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
-
-    .nav-badge {
-        margin-left: auto;
-        background: #dc2626;
-        color: #fff;
-        font-size: .65rem;
-        font-weight: 700;
-        min-width: 18px; height: 18px;
-        border-radius: 100px;
-        display: flex; align-items: center; justify-content: center;
-        padding: 0 5px;
-    }
-
-    .nav-badge-grey {
-        margin-left: auto;
-        background: #d1d5db;
-        color: #374151;
-        font-size: .65rem;
-        font-weight: 700;
-        min-width: 18px; height: 18px;
-        border-radius: 100px;
-        display: flex; align-items: center; justify-content: center;
-        padding: 0 5px;
-    }
-
-    .sidebar-logout {
-        border-top: 1px solid #d4dae8;
-        padding: 14px 20px;
-    }
-    .sidebar-logout a {
-        display: flex; align-items: center; gap: 8px;
-        color: #666; font-size: .88rem;
-        text-decoration: none; font-weight: 500;
-    }
-    .sidebar-logout a:hover { color: var(--navy); }
-
-    /* ══════════════════════════
-       MAIN AREA
-    ══════════════════════════ */
-    .dash-main {
-        margin-left: var(--sidebar-w);
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        overflow-y: auto;
-        background: var(--bg);
-    }
-
-    /* Top header bar */
-    .dash-topbar {
-        background: var(--white);
-        border-bottom: 1px solid #d4dae8;
-        padding: 14px 28px;
+    /* Dashboard Topbar */
+    .student-dash-topbar {
+        background: #ffffff;
+        padding: 1rem 2rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        position: sticky;
-        top: 0;
-        z-index: 50;
+        border-bottom: 1px solid #dde3ed;
     }
-
-    .topbar-title {
-        font-family: 'Book antiqua', serif;
-        font-size: 1.5rem;
-        color: #1c236d;
-        font-weight: 700;
-        
+    .student-dash-topbar-title {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #0d1b4b;
+        letter-spacing: -.02em;
     }
-
-    .topbar-user {
+    .student-user-pill {
         display: flex;
-        color: #1c236d;
         align-items: center;
-        gap: 12px;
+        gap: .65rem;
     }
-
-    .user-avatar {
-        width: 42px; height: 42px;
+    .student-avatar {
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: #1c236d;
+        background: #0d1b4b;
         color: #fff;
-        display: flex; align-items: center; justify-content: center;
-        font-family: 'EB Garamond', serif;
-        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-weight: 700;
+        font-size: .85rem;
         flex-shrink: 0;
     }
-
-    .user-info { text-align: right; }
-    .user-info .name {
+    .student-user-name {
         font-weight: 700;
         font-size: .9rem;
-        color: #1c236d;
+        color: #0d1b4b;
         line-height: 1.2;
     }
-    .user-info .role {
-        font-size: .77rem;
-        color: #94a3b8;
-    }
-
-    /* Content area */
-    .dash-content {
-        padding: 24px 28px;
-        flex: 1;
-    }
-
-    /* ── Welcome banner ── */
-    .welcome-banner {
-        background: #1c236d;
-        border-radius: 14px;
-        padding: 22px 28px;
-        margin-bottom: 22px;
-        color: #fff;
-    }
-
-    .welcome-banner .label {
-        font-size: .72rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: rgba(255,255,255,.55);
-        margin-bottom: 4px;
-    }
-
-    .welcome-banner .welcome-name {
-        font-family: 'EB Garamond', serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 18px;
-    }
-
-    .banner-stats {
-        display: flex;
-        gap: 14px;
-        color:#1c236d;
-        flex-wrap: wrap;
-    }
-
-    .banner-stat {
-        background: white;
-        color:#1c236d;
-        border: 1px solid rgba(255,255,255,.15);
-        border-radius: 10px;
-        padding: 14px 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 180px;
-        flex: 1;
-    }
-
-    .banner-stat-icon {
-        width: 36px; height: 36px;
-        background: rgba(255,255,255,.12);
-        border-radius: 8px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1rem;
-        flex-shrink: 0;
-    }
-
-    .banner-stat-num {
-        font-family: 'Book antiqua', serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #1c236d;
-        line-height: 1;
-    }
-
-    .banner-stat-label {
-        font-size: .78rem;
-        color: #1c236d;
-        margin-top: 2px;
-    }
-
-    /* ── Quick access section ── */
-    .section-card {
-        background: var(--white);
-        border: 1px solid #d4dae8;
-        border-radius: 14px;
-        padding: 22px 24px;
-        margin-bottom: 20px;
-    }
-
-    .section-title {
-        font-family: 'Book antiqua', serif;
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #1c236d;
-        margin-bottom: 16px;
-    }
-
-    .quick-btns {
-        display: flex;
-        background: white;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .quick-btn {
-        background: #1c236d;
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        padding: .65rem 1.5rem;
-        font-family: 'Source Sans 3', sans-serif;
-        font-size: .88rem;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: opacity .18s, transform .15s;
-    }
-    .quick-btn:hover { opacity: .88; transform: translateY(-1px); color: #fff; }
-
-    /* ── Stat cards (overview) ── */
-    .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 14px;
-        margin-bottom: 20px;
-    }
-
-    .stat-card {
-        background: #ffffff;
-        border: 1px solid #d4dae8;
-        border-radius: 12px;
-        padding: 18px 20px;
-        text-align: left;
-    }
-
-    .stat-card .stat-label {
-        font-size: .78rem;
-        color: #64748b;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: .8px;
-        margin-bottom: 8px;
-    }
-
-    .stat-card .stat-count {
-        font-family: 'Book antiqua', serif;
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #1c236d;
-        line-height: 1;
-        margin-bottom: 12px;
-    }
-
-    .stat-card .btn-card {
+    .student-user-role {
         font-size: .75rem;
-        font-weight: 600;
-        color: #1c236d;
-        text-decoration: none;
-        border: 1px solid #b0bcd4;
-        border-radius: 100px;
-        padding: .22rem .75rem;
-        display: inline-block;
-        background: #f8faff;
-        transition: background .15s, color .15s;
+        color: #6b7a99;
     }
-    .stat-card .btn-card:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
 
-    /* ── Cards grid (bottom) ── */
-    .cards-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 20px;
+    /* Main Content Padding */
+    .student-dash-main {
+        padding: 1.5rem 2rem 3rem;
     }
-    @media (max-width: 900px) { .cards-grid { grid-template-columns: 1fr; } }
 
-    .info-card {
-        background: var(--white);
-        border: 1px solid #d4dae8;
-        border-radius: 14px;
+    .student-hero-card {
+        background: #0d1b4b;
+        border-radius: .75rem;
+        padding: 1.6rem 2rem;
+        color: #ffffff;
+        position: relative;
         overflow: hidden;
-    }
-
-    .info-card-header {
-        padding: 14px 18px;
-        border-bottom: 1px solid #eef1f8;
         display: flex;
-        color:#1c236d;
         align-items: center;
         justify-content: space-between;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .student-hero-card::before {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.04);
     }
 
-    .info-card-header h6 {
-        font-weight: 700;
-        font-size: .88rem;
-        color: #1c236d;
-        margin: 0;
+    .student-stats-row {
+        margin-top: 1.2rem;
     }
-
-    .info-card-header a {
-        font-size: .78rem;
-        color: #1c236d;
-        text-decoration: none;
-        font-weight: 600;
-        border: 1px solid #b0bcd4;
-        border-radius: 100px;
-        padding: .2rem .7rem;
-        transition: background .15s;
+    .student-stat-card {
+        background: #ffffff;
+        border-radius: .75rem;
+        padding: 1.1rem 1.2rem;
+        box-shadow: 0 6px 18px rgba(0,0,0,.04);
+        border: 1px solid #dde3f4;
+        text-align: center;
+        min-height: 110px;
     }
-    .info-card-header a:hover { background: var(--navy); color: #fff; }
-
-    .info-card-body { padding: 16px 18px; }
-
-    .course-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px 0;
-        border-bottom: 1px solid #f0f3f8;
-        text-decoration: none;
-        color: inherit;
+    .student-stat-card-icon {
+        font-size: 1.3rem;
+        margin-bottom: .4rem;
     }
-    .course-row:last-child { border-bottom: none; }
-    .course-row:hover { background: #f8faff; margin: 0 -18px; padding: 10px 18px; }
-
-    .course-thumb {
-        width: 44px; height: 44px;
-        border-radius: 8px;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-
-    .course-thumb-placeholder {
-        width: 44px; height: 44px;
-        border-radius: 8px;
-        background: #1c236d;
-        color: #fff;
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
+    .student-stat-card-label {
         font-size: .9rem;
-    }
-
-    .course-info { flex: 1; min-width: 0; }
-    .course-info .course-name {
         font-weight: 600;
-        font-size: .88rem;
-        color: #1c236d;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        color: #0d1b4b;
     }
-    .course-info .course-teacher { font-size: .76rem; color: #94a3b8; }
-
-    .progress-bar-wrap {
-        height: 5px;
-        background: #e2e8f0;
-        border-radius: 3px;
-        margin-top: 6px;
-        overflow: hidden;
+    .student-stat-card-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0d1b4b;
+        margin-bottom: .1rem;
     }
-    .progress-bar-fill {
-        height: 100%;
-        background: var(--navy);
-        border-radius: 3px;
-        transition: width .4s;
+    .student-hero-text h2 {
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.6);
+        margin: 0 0 .3rem;
     }
-    .pct-label { font-size: .72rem; color: #94a3b8; margin-top: 3px; }
-
-    /* Overdue warning */
-    .stat-card-warning {
-        border-color: #fbbf24;
-        background: #fffbeb;
+    .student-hero-text h3 {
+        font-size: 1.45rem;
+        font-weight: 800;
+        margin: 0 0 .6rem;
+        letter-spacing: -.01em;
     }
-
-    /* Quick links */
-    .quick-links-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 14px;
+    .student-hero-text p {
+        margin: 0;
+        font-size: .8rem;
+        color: rgba(255,255,255,.75);
     }
-    .ql-btn {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: .45rem 1rem;
-        border: 1px solid #b0bcd4;
-        border-radius: 100px;
-        color: #1c236d;
-        font-size: .82rem;
+    .student-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: #c0392b;
+        color: #fff;
+        padding: .4rem 1.4rem;
+        border-radius: 2rem;
+        font-size: .9rem;
         font-weight: 600;
-        text-decoration: none;
-        background: #fff;
-        transition: background .15s, color .15s;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
-    .ql-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
-
-    /* Responsive sidebar collapse */
     @media (max-width: 768px) {
-        .dash-sidebar { width: 220px; transform: translateX(-100%); transition: transform .25s; }
-        .dash-sidebar.open { transform: translateX(0); }
-        .dash-main { margin-left: 0; }
-        .dash-topbar { padding: 12px 16px; }
-        .dash-content { padding: 16px; }
+        .student-dash-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .student-hero-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dash-shell">
-
-    <!-- ══════ SIDEBAR ══════ -->
-    <aside class="dash-sidebar" id="dashSidebar">
-        <div class="sidebar-brand">
-            <img src="{% static 'img/tpf_logo.png' %}" alt="TPF Logo">
-            <div class="sidebar-brand-name">TPF E-Learning</div>
+<div class="student-dash-wrap">
+    <!-- Topbar -->
+    <div class="student-dash-topbar">
+        <div class="student-dash-topbar-title">Dashboard</div>
+        <div class="student-user-pill">
+            <div class="student-avatar">
+                {% with initials=request.user.first_name|slice:":1" %}{{ initials }}{% endwith %}{% with initials=request.user.last_name|slice:":1" %}{{ initials }}{% endwith %}
+            </div>
+            <div>
+                <div class="student-user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <div class="student-user-role">
+                    {% if request.user.is_student %} Student {% endif %}
+                    {% if request.user.is_instructor %} Instructor {% endif %}
+                </div>
+            </div>
         </div>
+    </div>
 
-        <nav class="sidebar-nav">
-            <a href="{% url 'dashboard' %}" class="nav-item active" style="color: #1c236d;">
-                <i class="bi bi-grid-fill" style="color: #1c236d;"></i> Dashboard
-            </a>
-            <a href="{% url 'courses:list' %}" class="nav-item">
-                <i class="bi bi-mortarboard"></i> Documents Library
-            </a>
-            <a href="{% url 'enrollment:my_courses' %}" class="nav-item">
-                <i class="bi bi-collection-fill"></i> My Courses
-                {% if enrolled_count %}<span class="nav-badge-grey">{{ enrolled_count }}</span>{% endif %}
-            </a>
-            <a href="{% url 'enrollment:study_list' %}" class="nav-item">
-                <i class="bi bi-bookmark-fill"></i> Saved Documents
-                {% if study_list_count %}<span class="nav-badge">{{ study_list_count }}</span>{% endif %}
-            </a>
-            <a href="{% url 'enrollment:assignments_done' %}" class="nav-item">
-                <i class="bi bi-file-earmark-check-fill"></i> Assignments
-                {% if assignments_done_count %}<span class="nav-badge-grey">{{ assignments_done_count }}</span>{% endif %}
-            </a>
-            <a href="{% url 'conferences:list' %}" class="nav-item">
-                <i class="bi bi-camera-video-fill"></i> Live Sessions
-            </a>
-            <a href="{% url 'messaging:inbox' %}" class="nav-item">
-                <i class="bi bi-envelope-fill"></i> Messages
-            </a>
-            <a href="{% url 'users:profile' pk=request.user.pk %}" class="nav-item">
-                <i class="bi bi-person-fill"></i> My Profile
-            </a>
-        </nav>
+    <!-- Main Content -->
+    <div class="student-dash-main">
+        <div class="container-fluid">
 
-        <div class="sidebar-logout">
-            <a href="{% url 'account_logout' %}">
-                <i class="bi bi-box-arrow-left"></i> Logout
-            </a>
-        </div>
-    </aside>
-
-    <!-- ══════ MAIN ══════ -->
-    <div class="dash-main">
-
-        <!-- Top bar -->
-        <header class="dash-topbar">
-            <div style="display:flex;align-items:center;gap:12px;">
-                <!-- Mobile menu toggle -->
-                <button class="d-md-none btn btn-sm btn-outline-secondary" id="sidebarToggle" style="border-radius:8px;">
-                    <i class="bi bi-list"></i>
-                </button>
-                <span class="topbar-title">Dashboard</span>
-            </div>
-            <div class="topbar-user">
-                <div class="user-info">
-                    <div class="name">{{ request.user.get_full_name|default:request.user.username }}</div>
-                    <div class="role">
-                        {% if request.user.profile.student_type == 'dpa' %}DPA Students
-                        {% elif request.user.profile.student_type %}{{ request.user.profile.student_type|title }}
-                        {% else %}Student{% endif %}
+            <div class="student-hero-card">
+                <div class="student-hero-text">
+                    <h2>Welcome back</h2>
+                    <h3>{{ request.user.get_full_name|default:request.user.username }}</h3>
+                    <p>
+                        {% if upcoming_conferences_count %}
+                            You have {{ upcoming_conferences_count }} live session{% if upcoming_conferences_count > 1 %}s{% endif %} today.
+                        {% else %}
+                            You have no live sessions scheduled for today.
+                        {% endif %}
+                    </p>
+                </div>
+                {% if upcoming_conferences %}
+                <div>
+                    <div class="student-hero-badge">
+                        <i class="bi bi-broadcast-pin"></i>
+                        LIVE:{{ upcoming_conferences.0.title }}
+                        {% if upcoming_conferences.0.scheduled_at %}
+                            · {{ upcoming_conferences.0.scheduled_at|date:"H:i" }}
+                        {% endif %}
                     </div>
-                </div>
-                <div class="user-avatar">
-                    {% with name=request.user.get_full_name|default:request.user.username %}
-                    {{ name|slice:":1"|upper }}{{ name|slice:"1:"|cut:" "|slice:":1"|upper }}
-                    {% endwith %}
-                </div>
-            </div>
-        </header>
-
-        <!-- Content -->
-        <div class="dash-content">
-
-            <!-- Welcome banner -->
-            <div class="welcome-banner">
-                <div class="label">Welcome Back</div>
-                <div class="welcome-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-                <div class="banner-stats">
-                    <div class="banner-stat">
-                        <div class="banner-stat-icon"><i class="bi bi-file-earmark-text"></i></div>
-                        <div>
-                            <div class="banner-stat-num">{{ enrolled_count|default:"0" }}</div>
-                            <div class="banner-stat-label">Total Document</div>
-                        </div>
-                    </div>
-                    <div class="banner-stat">
-                        <div class="banner-stat-icon"><i class="bi bi-bookmark-fill"></i></div>
-                        <div>
-                            <div class="banner-stat-num">{{ study_list_count|default:"0" }}</div>
-                            <div class="banner-stat-label">Saved Documents</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick access documents -->
-            <div class="section-card">
-                <div class="section-title">Quick access Documents</div>
-                <div class="quick-btns">
-                    <a href="{% url 'courses:list' %}?q=police+general+orders" class="quick-btn">
-                        <i class="bi bi-file-earmark-text"></i> Police General Orders (PGO)
-                    </a>
-                    <a href="{% url 'courses:list' %}?q=criminal+procedure" class="quick-btn">
-                        <i class="bi bi-file-earmark-text"></i> Criminal Procedure Act (CPA)
-                    </a>
-                </div>
-            </div>
-
-            <!-- Overview stat cards -->
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <div class="stat-label">My courses</div>
-                    <div class="stat-count">{{ enrolled_count|default:"0" }}</div>
-                    <a class="btn-card" href="{% url 'enrollment:my_courses' %}">View all</a>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Assignments done</div>
-                    <div class="stat-count">{{ assignments_done_count|default:"0" }}</div>
-                    <a class="btn-card" href="{% url 'enrollment:assignments_done' %}">View all</a>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Quizzes done</div>
-                    <div class="stat-count">{{ quizzes_done_count|default:"0" }}</div>
-                    <a class="btn-card" href="{% url 'enrollment:quizzes_done' %}">View all</a>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Study list</div>
-                    <div class="stat-count">{{ study_list_count|default:"0" }}</div>
-                    <a class="btn-card" href="{% url 'enrollment:study_list' %}">View list</a>
-                </div>
-                {% if overdue_count > 0 %}
-                <div class="stat-card stat-card-warning">
-                    <div class="stat-label" style="color:#d97706;">Overdue</div>
-                    <div class="stat-count" style="color:#d97706;">{{ overdue_count }}</div>
-                    <a class="btn-card" href="{% url 'enrollment:my_courses' %}">View all</a>
                 </div>
                 {% endif %}
             </div>
 
-            <!-- Courses + New materials -->
-              <div class="cards-grid">
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <h6>My Courses</h6>
-                        <a href="{% url 'enrollment:my_courses' %}">View all</a>
-                    </div>
-                    <div class="info-card-body">
-                        {% if enrollment_progress %}
-                            {% for enrollment, pct in enrollment_progress %}
-                            <a href="{% url 'courses:content' pk=enrollment.course.pk %}" class="course-row">
-                                {% if enrollment.course.image_if_exists %}
-                                <img src="{{ enrollment.course.image_if_exists.url }}" class="course-thumb" alt="">
-                                {% else %}
-                                <div class="course-thumb-placeholder"><i class="bi bi-book"></i></div>
-                                {% endif %}
-                                <div class="course-info">
-                                    <div class="course-name">{{ enrollment.course.fullname }}</div>
-                                    {% if enrollment.course.teacher %}<div class="course-teacher">{{ enrollment.course.teacher.get_full_name }}</div>{% endif %}
-                                    <div class="progress-bar-wrap">
-                                        <div class="progress-bar-fill" style="width:{{ pct }}%;"></div>
-                                    </div>
-                                    <div class="pct-label">{{ pct }}% complete</div>
-                                </div>
-                                <i class="bi bi-chevron-right" style="color:#94a3b8;font-size:.8rem;flex-shrink:0;"></i>
-                            </a>
-                            {% endfor %}
-                        {% else %}
-                        <p style="color:#94a3b8;font-size:.88rem;margin:0;">You are not enrolled in any courses yet.</p>
-                        <a href="{% url 'courses:list' %}" class="ql-btn mt-2" style="display:inline-flex; color: #1c236d;">Course catalog</a>
-                        {% endif %}
+            <!-- Overview stat cards -->
+            <div class="row g-3 student-stats-row">
+                <div class="col-6 col-md-3">
+                    <div class="student-stat-card">
+                        <div class="student-stat-card-icon"><i class="bi bi-journal-bookmark text-primary"></i></div>
+                        <div class="student-stat-card-value">{{ enrolled_count }}</div>
+                        <div class="student-stat-card-label">Enrolled courses</div>
                     </div>
                 </div>
- 
-                <div>
-                    <!-- New learning materials -->
-                    <div class="info-card mb-3">
-                        <div class="info-card-header">
-                            <h6>New Learning Materials</h6>
-                            <a href="{% url 'courses:list' %}">Browse all</a>
-                        </div>
-                        <div class="info-card-body">
-                            {% if new_courses %}
-                                {% for course in new_courses %}
-                                <a href="{{ course.get_absolute_url }}" class="course-row">
-                                    {% if course.image_if_exists %}
-                                    <img src="{{ course.image_if_exists.url }}" class="course-thumb" alt="">
-                                    {% else %}
-                                    <div class="course-thumb-placeholder"><i class="bi bi-book"></i></div>
-                                    {% endif %}
-                                    <div class="course-info">
-                                        <div class="course-name">{{ course.fullname }}</div>
-                                    </div>
-                                    <i class="bi bi-chevron-right" style="color:#94a3b8;font-size:.8rem;"></i>
-                                </a>
-                                {% endfor %}
-                            {% else %}
-                            <p style="color:#94a3b8;font-size:.88rem;margin:0;">No new courses at the moment.</p>
-                            {% endif %}
-                        </div>
+                <div class="col-6 col-md-3">
+                    <div class="student-stat-card">
+                        <div class="student-stat-card-icon"><i class="bi bi-check-circle-fill text-success"></i></div>
+                        <div class="student-stat-card-value">{{ assignments_done_count }}</div>
+                        <div class="student-stat-card-label">Modules completed</div>
                     </div>
- 
-                    <!-- Upcoming live sessions -->
-                    <div class="info-card">
-                        <div class="info-card-header">
-                            <h6><i class="bi bi-camera-video me-1" style="color:var(--navy);"></i>Upcoming Sessions</h6>
-                            <a href="{% url 'conferences:list' %}">View all</a>
-                        </div>
-                        <div class="info-card-body">
-                            {% if upcoming_conferences %}
-                            <ul style="list-style:none;padding:0;margin:0;font-size:.84rem;">
-                                {% for conf in upcoming_conferences %}
-                                <li style="padding:7px 0;border-bottom:1px solid #f0f3f8;display:flex;gap:10px;align-items:flex-start;">
-                                    <i class="bi bi-clock" style="color:#94a3b8;flex-shrink:0;margin-top:2px;"></i>
-                                    <div>
-                                        <a href="{% url 'conferences:room' slug=conf.room_slug %}" style="font-weight:600;color:var(--navy);text-decoration:none;">{{ conf.title }}</a>
-                                        <div style="color:#94a3b8;font-size:.76rem;">{{ conf.course.fullname }} · {{ conf.scheduled_at|date:"M d, H:i" }}</div>
-                                    </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                            {% else %}
-                            <p style="color:#94a3b8;font-size:.88rem;margin:0;">No upcoming live sessions.</p>
-                            {% endif %}
-                        </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="student-stat-card">
+                        <div class="student-stat-card-icon"><i class="bi bi-file-earmark-text text-primary"></i></div>
+                        <div class="student-stat-card-value">{{ new_courses|length }}</div>
+                        <div class="student-stat-card-label">Added materials</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="student-stat-card">
+                        <div class="student-stat-card-icon"><i class="bi bi-exclamation-circle text-warning"></i></div>
+                        <div class="student-stat-card-value">{{ overdue_count }}</div>
+                        <div class="student-stat-card-label">Pending modules</div>
                     </div>
                 </div>
             </div>
-
-            <!-- Overdue assignments warning -->
-            {% if overdue_assignments %}
-            <div class="info-card mt-3" style="border-color:#fbbf24;background:#fffbeb;">
-                <div class="info-card-header" style="background:#fef3c7;border-bottom-color:#fde68a;">
-                    <h6 style="color:#d97706;"><i class="bi bi-exclamation-triangle me-1"></i>Overdue Assignments</h6>
-                </div>
-                <div class="info-card-body">
-                    <ul style="list-style:none;padding:0;margin:0;font-size:.88rem;">
-                        {% for a in overdue_assignments %}
-                        <li style="padding:6px 0;border-bottom:1px solid #fde68a;">
-                            <a href="{% url 'courses:content' pk=a.course.pk %}" style="font-weight:600;color:var(--navy);text-decoration:none;">{{ a.title }}</a>
-                            <span style="color:#94a3b8;"> — {{ a.course.fullname }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Quick links -->
-            <div class="section-card" style="margin-top:20px;">
-                <div class="section-title">Quick Links</div>
-                <div class="quick-links-row">
-                    <a class="ql-btn" href="{% url 'courses:list' %}"><i class="bi bi-book me-1"></i>Course catalog</a>
-                    <a class="ql-btn" href="{% url 'enrollment:my_courses' %}"><i class="bi bi-collection me-1"></i>My courses</a>
-                    <a class="ql-btn" href="{% url 'enrollment:study_list' %}"><i class="bi bi-bookmark-star me-1"></i>Study list</a>
-                    <a class="ql-btn" href="{% url 'conferences:list' %}"><i class="bi bi-camera-video me-1"></i>Live sessions</a>
-                    <a class="ql-btn" href="{% url 'messaging:inbox' %}"><i class="bi bi-envelope me-1"></i>Messages</a>
-                </div>
-            </div>
-
-        </div><!-- /dash-content -->
-    </div><!-- /dash-main -->
-</div><!-- /dash-shell -->
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Mobile sidebar toggle
-    const toggle = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('dashSidebar');
-    if (toggle && sidebar) {
-        toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
-    }
-</script>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,160 +1,299 @@
-{% extends 'base.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanzania Police Force — Training Portal</title>
 
-{% block title %}TPF Training Portal — Tanzania Police Force{% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-{% block extra_css %}
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+    <style>
+        :root {
+            --tpf-navy: #1c236d;
+            --tpf-navy-dark: #0b143f;
+            --tpf-text: #0d1f4e;
+            --tpf-bg: #e8eff8;
+        }
 
-    :root {
-        --navy: #0d1f4e;
-        --navy-dark: #081535;
-        --gold: #c8a84b;
-        --gold-light: #e0c87a;
-        --white: #ffffff;
-    }
+        * { box-sizing: border-box; }
 
-    body { font-family: 'Book Antiqua', serif; margin: 0; padding-bottom: 10; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'EB Garamond', 'Book Antiqua', Georgia, serif;
+            background-color: var(--tpf-bg);
+        }
 
-    /* ── TOP HEADER ── */
-    .tpf-top-header {
-        background: #1c236d;
-        border-bottom: 3px ;
-        padding: 12px 0;
-    }
-    .tpf-top-header .header-title {
-        font-family: 'EB Garamond', serif;
-        font-weight: 700;
-        font-size: 1.15rem;
-        color: var(--white);
-        text-transform: uppercase;
-        letter-spacing: .5px;
-        line-height: 1.6;
-        text-align: center;
-    }
-    .tpf-top-header .header-title span {
-        display: block;
-        font-size: .95rem;
-        font-weight: 600;
-    }
-    .tpf-top-header img.crest {
-        height: 70px;
-        object-fit: contain;
-    }
+        /* ── TOP HEADER ───────────────────────────────────────── */
+        .tpf-header {
+            background: var(--tpf-navy);
+            color: #ffffff;
+            padding: 0.75rem 0;
+        }
 
-    /* ── HERO ── */
-    .tpf-hero {
-        background: #e8eff8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='520'%3E%3Cdefs%3E%3Cstyle%3E.g%7Bfill:none;stroke:%238fa8cc;stroke-opacity:.2;%7D%3C/style%3E%3C/defs%3E%3Ccircle class='g' cx='130' cy='140' r='90' stroke-width='2'/%3E%3Ccircle class='g' cx='130' cy='140' r='65' stroke-width='1.5'/%3E%3Ccircle class='g' cx='130' cy='140' r='35'/%3E%3Ccircle class='g' cx='130' cy='140' r='12'/%3E%3Ccircle class='g' cx='1050' cy='350' r='110' stroke-width='2'/%3E%3Ccircle class='g' cx='1050' cy='350' r='80' stroke-width='1.5'/%3E%3Ccircle class='g' cx='1050' cy='350' r='45'/%3E%3Ccircle class='g' cx='1050' cy='350' r='15'/%3E%3Ccircle class='g' cx='1100' cy='90' r='65' stroke-width='1.5'/%3E%3Ccircle class='g' cx='1100' cy='90' r='40'/%3E%3Ccircle class='g' cx='60' cy='430' r='55'/%3E%3Ccircle class='g' cx='60' cy='430' r='28'/%3E%3Ccircle class='g' cx='600' cy='480' r='30'/%3E%3Ccircle class='g' cx='600' cy='480' r='15'/%3E%3Cpath class='g' d='M0 200 Q200 120 400 200 T800 160 T1200 220' stroke-width='1'/%3E%3Cpath class='g' d='M0 300 Q250 220 500 310 T900 270 T1200 320' stroke-width='.8'/%3E%3Cpath class='g' d='M100 50 Q300 20 500 80 T850 40 T1100 70' stroke-width='.7'/%3E%3Crect class='g' x='420' y='80' width='70' height='70' rx='6' stroke-width='1.2' transform='rotate(15 455 115)'/%3E%3Crect class='g' x='700' y='200' width='55' height='55' rx='4' stroke-width='1' transform='rotate(-12 727 227)'/%3E%3Crect class='g' x='280' y='340' width='48' height='48' rx='5' stroke-width='1' transform='rotate(8 304 364)'/%3E%3Cpolygon class='g' points='240,420 265,370 290,420' stroke-width='1'/%3E%3C/svg%3E") center/cover no-repeat;
-        padding: 90px 0 110px;
-        text-align: center;
-        min-height: 420px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .tpf-hero h1 {
-        font-family: 'EB Garamond', serif;
-        font-size: 3.6rem;
-        font-weight: 800;
-        color: var(--navy);
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        line-height: 1.15;
-        margin-bottom: .3rem;
-    }
-    .tpf-hero h2 {
-        font-family: 'EB Garamond', serif;
-        font-size: 2.1rem;
-        font-weight: 600;
-        color: var(--navy);
-        margin-bottom: 2.8rem;
-        letter-spacing: .5px;
-    }
-    .tpf-login-btn {
-        display: inline-block;
-        padding: .7rem 2.8rem;
-        border: 2px solid var(--navy);
-        border-radius: 50px;
-        color: var(--navy);
-        font-family: 'Source Sans 3', sans-serif;
-        font-weight: 700;
-        font-size: 1rem;
-        letter-spacing: .5px;
-        text-decoration: none;
-        transition: background .2s, color .2s;
-        background: transparent;
-    }
-    .tpf-login-btn:hover {
-        background: var(--navy);
-        color: var(--white);
-    }
+        .tpf-header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
 
-    /* ── FOOTER ── */
-    .tpf-footer {
-        background: #1c236d;
-        padding-top: 10px;
-        color: rgba(255,255,255,.85);
-    }
-    .tpf-footer h6 {
-        font-family: 'Book Antiqua', serif;
-        font-weight: 700;
-        font-size: 1rem;
-        color: white;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 1rem;
-        padding-bottom: .4rem;
-        border-bottom: 1px solid rgba(200,168,75,.3);
-    }
-    .tpf-footer p,
-    .tpf-footer li,
-    .tpf-footer a {
-        font-size: .875rem;
-        color: rgba(255,255,255,.78);
-        line-height: 1.75;
-    }
-    .tpf-footer a { text-decoration: none; }
-    .tpf-footer a:hover { color: var(--gold-light); }
-    .tpf-footer .footer-bottom {
-        border-top: 1px solid rgba(255,255,255,.1);
-        margin-top: 28px;
-        padding: 14px 0;
-        font-size: .82rem;
-        color: rgba(255,255,255,.5);
-        text-align: center;
-    }
-    .tpf-footer .footer-bottom strong { color: rgba(255,255,255,.72); }
-</style>
-{% endblock %}
+        .tpf-header .crest {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+        }
 
-{% block content %}
+        .tpf-header-title {
+            flex: 1;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            line-height: 1.5;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
 
-<!-- ── TOP HEADER ── -->
-<header class="tpf-top-header">
-    <div class="container">
-        <div class="d-flex align-items-center justify-content-between">
-            <img src="{% static 'img/tz ngao.png' %}" class="crest" alt="Coat of Arms of Tanzania">
-            <div class="header-title">
-                The United Republic of Tanzania
-                <span>Ministry of Home Affairs</span>
-                <span style="font-size:1.1rem;letter-spacing:1px;">Tanzania Police Force</span>
+        .tpf-header-title span {
+            display: block;
+        }
+
+        .tpf-header-title .tpf-name {
+            font-size: 1.1rem;
+            letter-spacing: 0.09em;
+        }
+
+        /* ── HERO PANEL ──────────────────────────────────────── */
+        .tpf-hero {
+            background: var(--tpf-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='520'%3E%3Cdefs%3E%3Cstyle%3E.g%7Bfill:none;stroke:%238fa8cc;stroke-opacity:.2;%7D%3C/style%3E%3C/defs%3E%3Ccircle class='g' cx='130' cy='140' r='90' stroke-width='2'/%3E%3Ccircle class='g' cx='130' cy='140' r='65' stroke-width='1.5'/%3E%3Ccircle class='g' cx='130' cy='140' r='35'/%3E%3Ccircle class='g' cx='130' cy='140' r='12'/%3E%3Ccircle class='g' cx='1050' cy='350' r='110' stroke-width='2'/%3E%3Ccircle class='g' cx='1050' cy='350' r='80' stroke-width='1.5'/%3E%3Ccircle class='g' cx='1050' cy='350' r='45'/%3E%3Ccircle class='g' cx='1050' cy='350' r='15'/%3E%3Ccircle class='g' cx='1100' cy='90' r='65' stroke-width='1.5'/%3E%3Ccircle class='g' cx='1100' cy='90' r='40'/%3E%3Ccircle class='g' cx='60' cy='430' r='55'/%3E%3Ccircle class='g' cx='60' cy='430' r='28'/%3E%3Ccircle class='g' cx='600' cy='480' r='30'/%3E%3Ccircle class='g' cx='600' cy='480' r='15'/%3E%3Cpath class='g' d='M0 200 Q200 120 400 200 T800 160 T1200 220' stroke-width='1'/%3E%3Cpath class='g' d='M0 300 Q250 220 500 310 T900 270 T1200 320' stroke-width='.8'/%3E%3Cpath class='g' d='M100 50 Q300 20 500 80 T850 40 T1100 70' stroke-width='.7'/%3E%3Crect class='g' x='420' y='80' width='70' height='70' rx='6' stroke-width='1.2' transform='rotate(15 455 115)'/%3E%3Crect class='g' x='700' y='200' width='55' height='55' rx='4' stroke-width='1' transform='rotate(-12 727 227)'/%3E%3Crect class='g' x='280' y='340' width='48' height='48' rx='5' stroke-width='1' transform='rotate(8 304 364)'/%3E%3Cpolygon class='g' points='240,420 265,370 290,420' stroke-width='1'/%3E%3C/svg%3E") center/cover no-repeat;
+            padding: 4.5rem 0 5.5rem;
+            flex: 1 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .tpf-hero-heading {
+            text-align: center;
+        }
+
+        .tpf-hero-heading h1 {
+            font-family: 'EB Garamond', serif;
+            font-size: clamp(2.4rem, 4.3vw, 3.4rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--tpf-text);
+            margin-bottom: 0.3rem;
+        }
+
+        .tpf-hero-heading h2 {
+            font-family: 'EB Garamond', serif;
+            font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+            font-weight: 600;
+            color: var(--tpf-text);
+            letter-spacing: 0.04em;
+            margin-bottom: 0;
+        }
+
+        .tpf-hero-login-wrap {
+            margin-top: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .tpf-login-btn,
+        .tpf-register-btn {
+            display: inline-block;
+            padding: 0.6rem 2.7rem;
+            border-radius: 999px;
+            border: 2px solid var(--tpf-text);
+            color: var(--tpf-text);
+            background-color: #ffffff;
+            font-family: 'Source Sans 3', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.06em;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .tpf-login-btn:hover,
+        .tpf-register-btn:hover {
+            background: var(--tpf-text);
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .tpf-header-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+            .tpf-header .crest {
+                height: 56px;
+            }
+            .tpf-hero {
+                padding: 3rem 0 3.5rem;
+            }
+            .tpf-hero-login-wrap {
+                justify-content: center;
+                margin-top: 2rem;
+            }
+        }
+
+        /* ── FOOTER ───────────────────────────────────────── */
+        .tpf-footer {
+            background: var(--tpf-navy);
+            color: #ffffff;
+            padding: 2.6rem 0 0;
+            border-top: 3px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .tpf-footer h6 {
+            font-family: 'EB Garamond', serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.9rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+            text-align: left;
+        }
+
+        .tpf-footer p,
+        .tpf-footer a {
+            font-family: 'Source Sans 3', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.7;
+        }
+
+        .tpf-footer a {
+            text-decoration: none;
+        }
+
+        .tpf-footer a:hover {
+            color: #ffffff;
+        }
+
+        .tpf-copy {
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            margin-top: 1.9rem;
+            padding: 0.9rem 0 1.1rem;
+            font-size: 0.9rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tpf-copy strong {
+            color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <header class="tpf-header">
+        <div class="container">
+            <div class="tpf-header-inner">
+                <img src="{% static 'img/tz ngao.png' %}" class="crest" alt="Coat of Arms of Tanzania">
+                <div class="tpf-header-title">
+                    <span>The United Republic of Tanzania</span>
+                    <span>Ministry of Home Affairs</span>
+                    <span class="tpf-name">Tanzania Police Force</span>
+                </div>
+                <img src="{% static 'img/tpf_logo.png' %}" class="crest" alt="Tanzania Police Force Logo">
             </div>
-            <img src="{% static 'img/tpf_logo.png' %}" class="crest" alt="Tanzania Police Force Logo">
         </div>
-    </div>
-</header>
+    </header>
 
-<!-- ── HERO ── -->
-<section class="tpf-hero">
-    <div class="container">
-        <h1>Tanzania Police Force</h1>
-        <h2>Training portal</h2>
-        <a href="{% url 'account_signup' %}" class="tpf-login-btn">Register</a>
-        <a href="{% url 'account_login' %}" class="tpf-login-btn">Login</a>
-    </div>
-</section>
+    <!-- HERO PANEL -->
+    <section class="tpf-hero">
+        <div class="container">
+            <div class="tpf-hero-heading">
+                <h1>Tanzania Police Force</h1>
+                <h2>Training portal</h2>
+            </div>
+            <div class="tpf-hero-login-wrap">
+                <a href="{% url 'account_signup' %}" class="tpf-register-btn">Register</a>
+                <a href="{% url 'account_login' %}" class="tpf-login-btn">Login</a>
+            </div>
+        </div>
+    </section>
 
+    <!-- FOOTER -->
+    <footer class="tpf-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h6>About the system</h6>
+                    <p>
+                        The Tanzania Police Force Training Portal is an official e‑learning platform
+                        that provides police officers and Police Academy students with access to
+                        professional training courses, legal reference materials, and live learning
+                        sessions.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Important links</h6>
+                    <p class="mb-1">
+                        <a href="https://www.tpf.go.tz" target="_blank" rel="noopener">
+                            <i class="bi bi-link-45deg me-1"></i>
+                            Tanzania Police Force — www.tpf.go.tz
+                        </a>
+                    </p>
+                    <p class="mb-1">
+                        <a href="https://pcc.tpf.go.tz" target="_blank" rel="noopener">
+                            <i class="bi bi-link-45deg me-1"></i>
+                            PCC — pcc.tpf.go.tz
+                        </a>
+                    </p>
+                    <p class="mb-1">
+                        <a href="https://lormis.tpf.go.tz" target="_blank" rel="noopener">
+                            <i class="bi bi-link-45deg me-1"></i>
+                            LORMIS — lormis.tpf.go.tz
+                        </a>
+                    </p>
+                    <p class="mb-0">
+                        <a href="https://rtoc.tpf.go.tz" target="_blank" rel="noopener">
+                            <i class="bi bi-link-45deg me-1"></i>
+                            RTOC — rtoc.tpf.go.tz
+                        </a>
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contact us</h6>
+                    <p class="mb-1">
+                        <i class="bi bi-geo-alt-fill me-1"></i>
+                        Address Tanzania Police Force Headquarters,
+                    </p>
+                    <p class="mb-1">
+                        <i class="bi bi-telephone-fill me-1"></i>
+                        Phone +255 22 286 5081
+                    </p>
+                    <p class="mb-1">
+                        <i class="bi bi-envelope-fill me-1"></i>
+                        Email <a href="mailto:info@tpf.go.tz">info@tpf.go.tz</a>
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-globe me-1"></i>
+                        Website <a href="https://www.tpf.go.tz" target="_blank" rel="noopener">www.tpf.go.tz</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="tpf-copy">
+            © 2026 <strong>Tanzania Police Force.</strong> All Rights Reserved.
+        </div>
+    </footer>
 
-
-{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

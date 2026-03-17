@@ -101,53 +101,49 @@ conta
     letter-spacing: -0.3px;
 }
 
-/* ── Global sidebar (dark navy) ── */
+/* ── Global sidebar (TPF light style) ── */
 #globalSidebar {
-    background-color: var(--el-primary) !important;
-    border-right: 1px solid rgba(255,255,255,.07) !important;
-}
-
-#globalSidebar .sidebar-avatar-initials {
-    background-color: rgba(255,255,255,.15) !important;
-    color: #fff !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid #e2e6f0 !important;
 }
 
 #globalSidebar .border-bottom {
-    border-bottom-color: rgba(255,255,255,.1) !important;
+    border-bottom-color: #e2e6f0 !important;
 }
 #globalSidebar .border-top {
-    border-top-color: rgba(255,255,255,.1) !important;
+    border-top-color: #e2e6f0 !important;
 }
-
-#globalSidebar .fw-semibold { color: #e8edf3; }
 
 #globalSidebar .sidebar-link {
-    color: #b8cce0;
+    color: #123067;
+    padding: 0.55rem 1.25rem;
+    border-radius: 0;
+    font-weight: 600;
+    font-size: 0.93rem;
+}
+#globalSidebar .sidebar-link i {
+    font-size: 1.05rem;
 }
 #globalSidebar .sidebar-link:hover {
-    background: rgba(255,255,255,.1);
-    color: #fff;
+    background: rgba(16,48,109,.06);
+    color: #123067;
 }
 #globalSidebar .sidebar-link.active {
-    background: var(--el-primary-light);
-    color: #fff;
+    background: #11316f;
+    color: #ffffff;
 }
 
 #globalSidebar .sidebar-section-label {
-    color: rgba(255,255,255,.35);
+    color: #7a869e;
 }
 
 #globalSidebar .text-danger {
-    color: #f4a4a4 !important;
+    color: #c53030 !important;
 }
 #globalSidebar .text-danger:hover {
     color: #fff !important;
-    background: rgba(220,53,69,.35) !important;
+    background: rgba(197,48,48,.18) !important;
 }
-
-#globalSidebar .sidebar-link i.text-success { color: #6ee7b7 !important; }
-#globalSidebar .sidebar-link i.text-danger  { color: #fca5a5 !important; }
-#globalSidebar .sidebar-link i.text-warning { color: #fcd34d !important; }
 
 /* ── Cards ── */
 .card {
