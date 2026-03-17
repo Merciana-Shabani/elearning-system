@@ -1,162 +1,501 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Instructor Dashboard — Elening LMS{% endblock %}
+{% block title %}Instructor Dashboard — TPF E-Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --navy: #0d1f4e;
+        --navy-dark: #081535;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Book antiqua', sans-serif;
+        background: var(--bg) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    /* ── SHELL ── */
+    .dash-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    /* ── SIDEBAR ── */
+    .dash-sidebar {
+        width: var(--sidebar-w);
+        background: var(--white);
+        border-right: 1px solid #d4dae8;
+        display: flex; flex-direction: column; flex-shrink: 0;
+        position: fixed; top: 0; left: 0; bottom: 0;
+        z-index: 100; overflow-y: auto;
+    }
+    .sidebar-brand {
+        padding: 20px 20px 16px;
+        border-bottom: 1px solid #d4dae8;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .sidebar-brand img { width: 60px; height: 60px; object-fit: contain; }
+    .sidebar-brand-name {
+        font-family: 'EB Garamond', serif;
+        font-size: .95rem; font-weight: 800; color: #1c236d;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        text-align: center; line-height: 1.3;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 11px 20px; color: #1c236d;
+        font-size: .9rem; font-weight: 500; text-decoration: none;
+        border-left: 3px solid transparent;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+    .nav-item:hover { background: #eef1f8; color: var(--navy); }
+    .nav-item.active { background: #eef1f8; color: var(--navy); font-weight: 700; border-left-color: var(--navy); }
+    .nav-item i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-section {
+        font-size: .67rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 1.5px; color: #94a3b8;
+        padding: 16px 20px 6px; display: block;
+    }
+    .nav-badge {
+        margin-left: auto; background: #dc2626; color: #fff;
+        font-size: .65rem; font-weight: 700;
+        min-width: 18px; height: 18px; border-radius: 100px;
+        display: flex; align-items: center; justify-content: center; padding: 0 5px;
+    }
+    .nav-badge-grey {
+        margin-left: auto; background: #d1d5db; color: #374151;
+        font-size: .65rem; font-weight: 700;
+        min-width: 18px; height: 18px; border-radius: 100px;
+        display: flex; align-items: center; justify-content: center; padding: 0 5px;
+    }
+    .sidebar-logout { border-top: 1px solid #d4dae8; padding: 14px 20px; }
+    .sidebar-logout a { display: flex; align-items: center; gap: 8px; color: #666; font-size: .88rem; text-decoration: none; font-weight: 500; }
+    .sidebar-logout a:hover { color: var(--navy); }
+
+    /* ── MAIN ── */
+    .dash-main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+
+    /* Topbar */
+    .dash-topbar {
+        background: var(--white); border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px; display: flex; align-items: center;
+        justify-content: space-between; position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; }
+    .topbar-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { text-align: right; }
+    .user-info .name { font-weight: 700; font-size: .9rem; color: #1c236d; line-height: 1.2; }
+    .user-info .role { font-size: .77rem; color: #94a3b8; }
+
+    /* Role badge */
+    .role-pill {
+        display: inline-block; background: #16a34a; color: #fff;
+        font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+        text-transform: uppercase; border-radius: 100px;
+        padding: .18rem .65rem; margin-top: 3px;
+    }
+
+    /* Content */
+    .dash-content { padding: 24px 28px; flex: 1; }
+
+    /* ── Welcome banner ── */
+    .welcome-banner {
+        background: #1c236d; border-radius: 14px;
+        padding: 22px 28px; margin-bottom: 22px; color: #fff;
+    }
+    .welcome-banner .label {
+        font-size: .72rem; font-weight: 700; letter-spacing: 2px;
+        text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 4px;
+    }
+    .welcome-banner .welcome-name {
+        font-family: 'EB Garamond', serif; font-size: 1.5rem;
+        font-weight: 700; color: #fff; margin-bottom: 18px;
+    }
+    .banner-stats { display: flex; gap: 14px; flex-wrap: wrap; }
+    .banner-stat {
+        background: white; color: #1c236d;
+        border: 1px solid rgba(255,255,255,.15); border-radius: 10px;
+        padding: 14px 20px; display: flex; align-items: center;
+        gap: 12px; min-width: 150px; flex: 1;
+    }
+    .banner-stat-icon {
+        width: 36px; height: 36px; background: #eef1f8;
+        border-radius: 8px; display: flex; align-items: center;
+        justify-content: center; font-size: 1rem; flex-shrink: 0; color: #1c236d;
+    }
+    .banner-stat-num { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; line-height: 1; }
+    .banner-stat-label { font-size: .78rem; color: #5a6a8a; margin-top: 2px; }
+
+    /* ── Stat cards ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .stat-card { background: #eef1f8; border: 1.5px solid #d4dae8; border-radius: 18px; padding: 22px 22px; text-align: left; }
+    .stat-card .stat-label { font-size: .72rem; color: #5a6a8a; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .stat-card .stat-count { font-family: 'Book antiqua', serif; font-size: 2.4rem; font-weight: 700; color: #1c236d; line-height: 1; margin-bottom: 18px; }
+    .stat-card .btn-card {
+        font-size: .78rem; font-weight: 600; color: #1c236d; text-decoration: none;
+        border: 1.5px solid #c8cfe0; border-radius: 100px; padding: .5rem 1rem;
+        display: block; text-align: center; background: #ffffff; width: 100%;
+        box-sizing: border-box; transition: background .15s, color .15s, border-color .15s;
+    }
+    .stat-card .btn-card:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+    .stat-card-warning { border-color: #fbbf24; background: #fffbeb; }
+
+    /* ── Info cards ── */
+    .info-card { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; overflow: hidden; }
+    .info-card-header {
+        padding: 14px 18px; border-bottom: 1px solid #eef1f8;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .info-card-header h6 { font-weight: 700; font-size: .92rem; color: #1c236d; margin: 0; }
+    .info-card-header a {
+        font-size: .78rem; color: #1c236d; text-decoration: none; font-weight: 600;
+        border: 1px solid #b0bcd4; border-radius: 100px; padding: .25rem .8rem;
+        transition: background .15s;
+    }
+    .info-card-header a:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+    .info-card-body { padding: 16px 18px; }
+
+    /* Course rows */
+    .course-row {
+        display: flex; align-items: center; gap: 14px;
+        padding: 12px 0; border-bottom: 1px solid #eef1f8;
+        text-decoration: none; color: inherit; transition: background .15s;
+    }
+    .course-row:last-child { border-bottom: none; }
+    .course-row:hover { background: #f4f6fb; margin: 0 -18px; padding: 12px 18px; }
+    .course-thumb { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+    .course-thumb-placeholder {
+        width: 52px; height: 52px; border-radius: 10px;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; font-size: 1.15rem;
+    }
+    .course-info { flex: 1; min-width: 0; }
+    .course-info .course-name { font-weight: 600; font-size: .88rem; color: #1c236d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .course-info .course-sub { font-size: .76rem; color: #94a3b8; }
+
+    /* Action btn group */
+    .act-btns { display: flex; gap: 4px; flex-shrink: 0; }
+    .act-btn {
+        padding: .3rem .7rem; font-size: .76rem; font-weight: 600;
+        border: 1px solid #b0bcd4; border-radius: 8px;
+        color: #1c236d; background: #fff; text-decoration: none;
+        transition: background .15s, color .15s;
+    }
+    .act-btn:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+    .act-btn-primary { background: #1c236d; color: #fff; border-color: #1c236d; }
+    .act-btn-primary:hover { opacity: .88; color: #fff; }
+
+    /* Two-column layout */
+    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* Section card (white) */
+    .section-card { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
+    .section-title { font-family: 'EB Garamond', serif; font-size: 1.15rem; font-weight: 700; color: #1c236d; margin-bottom: 16px; }
+
+    /* Quick links */
+    .quick-links-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .ql-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: .45rem 1rem; border: 1px solid #b0bcd4; border-radius: 100px;
+        color: #1c236d; font-size: .82rem; font-weight: 600;
+        text-decoration: none; background: #fff;
+        transition: background .15s, color .15s;
+    }
+    .ql-btn:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+
+    /* Live sessions card */
+    .live-card { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; padding: 20px; }
+    .live-card h6 { font-weight: 700; font-size: .92rem; color: #1c236d; margin-bottom: 10px; }
+    .live-card p { font-size: .84rem; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
+    .live-btn-primary {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; padding: .72rem; background: #1c236d; color: #fff;
+        border: none; border-radius: 10px; font-size: .88rem; font-weight: 700;
+        text-decoration: none; margin-bottom: 10px; transition: opacity .18s;
+    }
+    .live-btn-primary:hover { opacity: .88; color: #fff; }
+    .live-btn-secondary {
+        display: flex; align-items: center; justify-content: center;
+        width: 100%; padding: .68rem; background: #fff; color: #1c236d;
+        border: 1.5px solid #c8cfe0; border-radius: 10px; font-size: .88rem;
+        font-weight: 600; text-decoration: none; transition: background .15s;
+    }
+    .live-btn-secondary:hover { background: #eef1f8; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .dash-sidebar { width: 220px; transform: translateX(-100%); transition: transform .25s; }
+        .dash-sidebar.open { transform: translateX(0); }
+        .dash-main { margin-left: 0; }
+        .dash-topbar { padding: 12px 16px; }
+        .dash-content { padding: 16px; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="dashboard-dark-wrap">
-    <div class="container">
-        <h2 class="page-title"><i class="bi bi-person-badge me-2 text-success"></i>Instructor Dashboard</h2>
+<div class="dash-shell">
 
-        <!-- Overview: stat cards (same style as moderator dashboard) -->
-        <h6 class="fw-bold mb-3">Overview</h6>
-        <div class="row g-3 mb-3">
-            <div class="col-md-3">
+    <!-- ══════ SIDEBAR ══════ -->
+    <aside class="dash-sidebar" id="dashSidebar">
+        <div class="sidebar-brand">
+            <img src="{% static 'img/tpf_logo.png' %}" alt="TPF Logo">
+            <div class="sidebar-brand-name">TPF E-Learning</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item active">
+                <i class="bi bi-grid-fill"></i> Dashboard
+            </a>
+            <a href="{% url 'courses:teaching' %}" class="nav-item">
+                <i class="bi bi-book-fill"></i> Courses
+                {% if courses_teaching_count %}<span class="nav-badge-grey">{{ courses_teaching_count }}</span>{% endif %}
+            </a>
+            <a href="{% url 'courses:create' %}" class="nav-item">
+                <i class="bi bi-plus-circle-fill"></i> Create Course
+            </a>
+            <a href="{% url 'conferences:list' %}" class="nav-item">
+                <i class="bi bi-camera-video-fill"></i> Live Meeting
+            </a>
+            <a href="{% url 'quizzes:list' %}" class="nav-item">
+                <i class="bi bi-patch-question-fill"></i> Quiz
+            </a>
+            <a href="{% url 'assignments:teaching_list' %}" class="nav-item">
+                <i class="bi bi-file-earmark-check-fill"></i> Assignments
+                {% if pending_submissions_my %}<span class="nav-badge">{{ pending_submissions_my }}</span>{% endif %}
+            </a>
+            <a href="{% url 'enrollment:study_list' %}" class="nav-item">
+                <i class="bi bi-bookmark-fill"></i> Study list
+            </a>
+
+            <span class="nav-section">Account</span>
+            <a href="{% url 'users:profile' pk=request.user.pk %}" class="nav-item">
+                <i class="bi bi-person-fill"></i> Profile
+            </a>
+            <a href="{% url 'messaging:inbox' %}" class="nav-item">
+                <i class="bi bi-envelope-fill"></i> Messages
+            </a>
+        </nav>
+
+        <div class="sidebar-logout">
+            <a href="{% url 'account_logout' %}">
+                <i class="bi bi-box-arrow-left"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- ══════ MAIN ══════ -->
+    <div class="dash-main">
+
+        <!-- Topbar -->
+        <header class="dash-topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="d-md-none btn btn-sm btn-outline-secondary" id="sidebarToggle" style="border-radius:8px;">
+                    <i class="bi bi-list"></i>
+                </button>
+                <span class="topbar-title">Instructor Dashboard</span>
+            </div>
+            <div class="topbar-user">
+                <div class="user-info">
+                    <div class="name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                    <div><span class="role-pill">Instructor</span></div>
+                </div>
+                <div class="user-avatar">
+                    {% with name=request.user.get_full_name|default:request.user.username %}
+                    {{ name|slice:":1"|upper }}{{ name|slice:"1:"|cut:" "|slice:":1"|upper }}
+                    {% endwith %}
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="dash-content">
+
+            <!-- Welcome banner -->
+            <div class="welcome-banner">
+                <div class="label">Welcome Back</div>
+                <div class="welcome-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <div class="banner-stats">
+                    <div class="banner-stat">
+                        <div class="banner-stat-icon"><i class="bi bi-book-fill"></i></div>
+                        <div>
+                            <div class="banner-stat-num">{{ courses_teaching_count|default:"0" }}</div>
+                            <div class="banner-stat-label">Courses Teaching</div>
+                        </div>
+                    </div>
+                    <div class="banner-stat">
+                        <div class="banner-stat-icon"><i class="bi bi-people-fill"></i></div>
+                        <div>
+                            <div class="banner-stat-num">{{ total_enrollments_my|default:"0" }}</div>
+                            <div class="banner-stat-label">Total Enrollments</div>
+                        </div>
+                    </div>
+                    <div class="banner-stat">
+                        <div class="banner-stat-icon"><i class="bi bi-hourglass-split"></i></div>
+                        <div>
+                            <div class="banner-stat-num">{{ pending_submissions_my|default:"0" }}</div>
+                            <div class="banner-stat-label">Pending Approval</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat cards -->
+            <div class="stat-grid">
                 <div class="stat-card">
-                    <div class="stat-label">My courses</div>
-                    <div class="stat-count">{{ courses_teaching_count }}</div>
+                    <div class="stat-label">My Courses</div>
+                    <div class="stat-count">{{ courses_teaching_count|default:"0" }}</div>
                     <a class="btn-card" href="{% url 'courses:teaching' %}">Manage courses</a>
                 </div>
-            </div>
-            <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-label">Enrollments (my courses)</div>
-                    <div class="stat-count">{{ total_enrollments_my }}</div>
+                    <div class="stat-label">Enrollments</div>
+                    <div class="stat-count">{{ total_enrollments_my|default:"0" }}</div>
                     <a class="btn-card" href="{% url 'enrollment:instructor_enrollments' %}">View enrollments</a>
                 </div>
-            </div>
-            <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-label">Pending approval</div>
-                    <div class="stat-count">{{ pending_submissions_my }}</div>
+                    <div class="stat-label">Pending Approval</div>
+                    <div class="stat-count">{{ pending_submissions_my|default:"0" }}</div>
                     <a class="btn-card" href="{% url 'courses:teaching' %}">My courses</a>
                 </div>
-            </div>
-            <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-label">Quizzes</div>
-                    <div class="stat-count">{{ quizzes_count }}</div>
+                    <div class="stat-count">{{ quizzes_count|default:"0" }}</div>
                     <a class="btn-card" href="{% url 'quizzes:list' %}">Manage quizzes</a>
                 </div>
-            </div>
-        </div>
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-label">Assignments</div>
-                    <div class="stat-count">{{ assignments_count }}</div>
+                    <div class="stat-count">{{ assignments_count|default:"0" }}</div>
                     <a class="btn-card" href="{% url 'assignments:teaching_list' %}">Manage assignments</a>
                 </div>
-            </div>
-            <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-label">Upcoming live sessions</div>
-                    <div class="stat-count">{{ live_sessions_upcoming }}</div>
+                    <div class="stat-label">Upcoming Sessions</div>
+                    <div class="stat-count">{{ live_sessions_upcoming|default:"0" }}</div>
                     <a class="btn-card" href="{% url 'conferences:list' %}">Live sessions</a>
                 </div>
             </div>
-        </div>
 
-        <!-- Courses I teach + Enrolled / Live -->
-        <div class="row g-4 mb-4">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h6 class="fw-bold mb-0">Courses I teach</h6>
-                        <a href="{% url 'courses:teaching' %}" class="btn btn-sm btn-outline-primary">View all</a>
+            <!-- Courses I teach + Live sessions -->
+            <div class="two-col">
+
+                <!-- Courses I teach -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h6>Courses I Teach</h6>
+                        <a href="{% url 'courses:teaching' %}">View all</a>
                     </div>
-                    <div class="card-body">
+                    <div class="info-card-body">
                         {% if taught_courses %}
-                        <div class="list-group list-group-flush">
                             {% for course in taught_courses %}
-                            <div class="list-group-item d-flex align-items-center gap-3">
+                            <div class="course-row">
                                 {% if course.image_if_exists %}
-                                <img src="{{ course.image_if_exists.url }}" alt="" class="rounded flex-shrink-0" style="width:48px;height:48px;object-fit:cover">
+                                <img src="{{ course.image_if_exists.url }}" class="course-thumb" alt="">
                                 {% else %}
-                                <div class="rounded bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width:48px;height:48px"><i class="bi bi-book"></i></div>
+                                <div class="course-thumb-placeholder"><i class="bi bi-book"></i></div>
                                 {% endif %}
-                                <div class="flex-grow-1 min-width-0">
-                                    <div class="fw-semibold">{{ course.fullname }}</div>
-                                    <small class="text-muted">{{ course.shortname }}{% if course.status == 'submitted' %} · Pending approval{% elif course.status == 'needs_revision' %} · Needs revision{% endif %}</small>
+                                <div class="course-info">
+                                    <div class="course-name">{{ course.fullname }}</div>
+                                    <div class="course-sub">
+                                        {{ course.shortname }}
+                                        {% if course.status == 'submitted' %} · <span style="color:#d97706;">Pending approval</span>
+                                        {% elif course.status == 'needs_revision' %} · <span style="color:#dc2626;">Needs revision</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <div class="btn-group btn-group-sm flex-shrink-0">
-                                    <a class="btn btn-outline-primary" href="{% url 'courses:content' pk=course.pk %}">Content</a>
-                                    <a class="btn btn-outline-secondary" href="{% url 'courses:edit' pk=course.pk %}">Edit</a>
-                                    <a class="btn btn-outline-secondary" href="{% url 'courses:detail' pk=course.pk %}">View</a>
+                                <div class="act-btns">
+                                    <a class="act-btn act-btn-primary" href="{% url 'courses:content' pk=course.pk %}">Content</a>
+                                    <a class="act-btn" href="{% url 'courses:edit' pk=course.pk %}">Edit</a>
+                                    <a class="act-btn" href="{% url 'courses:detail' pk=course.pk %}">View</a>
                                 </div>
                             </div>
                             {% endfor %}
-                        </div>
                         {% else %}
-                        <p class="text-muted mb-0">No courses yet. Create one to add learning materials and enroll students.</p>
-                        <a href="{% url 'courses:create' %}" class="btn btn-primary btn-sm mt-2">Create course</a>
+                        <p style="color:#94a3b8;font-size:.88rem;margin:0 0 12px;">No courses yet. Create one to add learning materials.</p>
+                        <a href="{% url 'courses:create' %}" class="ql-btn"><i class="bi bi-plus-circle me-1"></i>Create course</a>
                         {% endif %}
                     </div>
                 </div>
-            </div>
 
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header py-3">
-                        <h6 class="fw-bold mb-0">Live sessions</h6>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted small mb-3">Schedule live briefings linked to a course (title, time, period).</p>
-                        <a href="{% url 'conferences:create' %}" class="btn btn-primary btn-sm w-100 mb-2">
-                            <i class="bi bi-camera-video me-1"></i>Prepare live session
+                <!-- Right column -->
+                <div style="display:flex;flex-direction:column;gap:16px;">
+
+                    <!-- Live sessions card -->
+                    <div class="live-card">
+                        <h6><i class="bi bi-camera-video me-1"></i>Live Sessions</h6>
+                        <p>Schedule live briefings linked to a course (title, time, period).</p>
+                        <a href="{% url 'conferences:create' %}" class="live-btn-primary">
+                            <i class="bi bi-camera-video-fill"></i> Prepare live session
                         </a>
-                        <a href="{% url 'conferences:list' %}" class="btn btn-outline-secondary btn-sm w-100">View all sessions</a>
+                        <a href="{% url 'conferences:list' %}" class="live-btn-secondary">
+                            View all sessions
+                        </a>
                     </div>
-                </div>
 
-                {% if enrolled_courses %}
-                <div class="card mt-3">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h6 class="fw-bold mb-0">Enrolled as student</h6>
-                        <a href="{% url 'enrollment:my_courses' %}" class="btn btn-sm btn-outline-primary">View all</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="list-group list-group-flush">
+                    <!-- Enrolled as student (if any) -->
+                    {% if enrolled_courses %}
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <h6>Enrolled as Student</h6>
+                            <a href="{% url 'enrollment:my_courses' %}">View all</a>
+                        </div>
+                        <div class="info-card-body">
                             {% for enrollment in enrolled_courses %}
-                            <a href="{% url 'courses:content' pk=enrollment.course.pk %}" class="list-group-item list-group-item-action small">
-                                {{ enrollment.course.fullname }}
+                            <a href="{% url 'courses:content' pk=enrollment.course.pk %}" class="course-row" style="padding:8px 0;">
+                                <div class="course-thumb-placeholder" style="width:36px;height:36px;font-size:.9rem;border-radius:8px;"><i class="bi bi-book"></i></div>
+                                <div class="course-info">
+                                    <div class="course-name">{{ enrollment.course.fullname }}</div>
+                                </div>
+                                <i class="bi bi-chevron-right" style="color:#94a3b8;font-size:.8rem;"></i>
                             </a>
                             {% endfor %}
                         </div>
                     </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+                    {% endif %}
 
-        <!-- Quick links (same style as moderator) -->
-        <div class="card">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">Quick links</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-outline-secondary" href="{% url 'courses:create' %}">
-                        <i class="bi bi-plus-circle me-1"></i>Create course
-                    </a>
-                    <a class="btn btn-outline-secondary" href="{% url 'courses:teaching' %}">
-                        <i class="bi bi-book me-1"></i>My courses
-                    </a>
-                    <a class="btn btn-outline-secondary" href="{% url 'quizzes:list' %}">
-                        <i class="bi bi-patch-question me-1"></i>Quizzes
-                    </a>
-                    <a class="btn btn-outline-secondary" href="{% url 'conferences:list' %}">
-                        <i class="bi bi-camera-video me-1"></i>Live sessions
-                    </a>
-                    <a class="btn btn-outline-secondary" href="{% url 'conferences:create' %}">
-                        <i class="bi bi-camera-video-fill me-1"></i>Prepare live session
-                    </a>
-                    <a class="btn btn-outline-secondary" href="{% url 'enrollment:study_list' %}">
-                        <i class="bi bi-bookmark-star me-1"></i>Study list
-                    </a>
-                    <a class="btn btn-outline-secondary" href="{% url 'courses:list' %}">
-                        <i class="bi bi-collection me-1"></i>Browse all courses
-                    </a>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+
+            <!-- Quick links -->
+            <div class="section-card">
+                <div class="section-title">Quick Links</div>
+                <div class="quick-links-row">
+                    <a class="ql-btn" href="{% url 'courses:create' %}"><i class="bi bi-plus-circle"></i>Create course</a>
+                    <a class="ql-btn" href="{% url 'courses:teaching' %}"><i class="bi bi-book"></i>My courses</a>
+                    <a class="ql-btn" href="{% url 'quizzes:list' %}"><i class="bi bi-patch-question"></i>Quizzes</a>
+                    <a class="ql-btn" href="{% url 'conferences:list' %}"><i class="bi bi-camera-video"></i>Live sessions</a>
+                    <a class="ql-btn" href="{% url 'conferences:create' %}"><i class="bi bi-camera-video-fill"></i>Prepare live session</a>
+                    <a class="ql-btn" href="{% url 'enrollment:study_list' %}"><i class="bi bi-bookmark-star"></i>Study list</a>
+                    <a class="ql-btn" href="{% url 'courses:list' %}"><i class="bi bi-collection"></i>Browse all courses</a>
+                </div>
+            </div>
+
+        </div><!-- /dash-content -->
+    </div><!-- /dash-main -->
+</div><!-- /dash-shell -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const toggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('dashSidebar');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    }
+</script>
 {% endblock %}

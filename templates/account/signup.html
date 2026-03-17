@@ -30,6 +30,7 @@
         background: #eef1f8;
         border: 1.5px solid #c8cfe0;
         border-radius: 28px;
+
         padding: 2.8rem 2.5rem;
         width: 100%;
         max-width: 480px;
@@ -39,10 +40,10 @@
     .auth-card.wide { max-width: 580px; }
 
     .auth-card h1 {
-        font-family: 'EB Garamond', serif;
+        font-family: 'Book Antiqua', serif;
         font-size: 1.5rem;
         font-weight: 800;
-        color: var(--navy);
+        color: #1c236d;
         text-transform: uppercase;
         letter-spacing: 2px;
         margin-bottom: 1.1rem;
@@ -56,7 +57,7 @@
 
     .auth-subtitle {
         font-size: .88rem;
-        color: #5a6a8a;
+        color: #1c236d;
         margin-bottom: 1.5rem;
     }
 
@@ -71,7 +72,7 @@
         border: 1.5px solid #b0bcd4;
         border-radius: 10px;
         background: transparent;
-        color: var(--navy);
+        color: #1c236d;
         font-family: 'Source Sans 3', sans-serif;
         font-size: .88rem;
         font-weight: 600;
@@ -88,7 +89,7 @@
     .reg-section {
         font-size: .67rem; font-weight: 700;
         text-transform: uppercase; letter-spacing: 1.5px;
-        color: var(--navy);
+        color: #1c236d;
         margin: 1.3rem 0 .75rem;
         display: flex; align-items: center; gap: .5rem;
         text-align: left;
@@ -153,9 +154,9 @@
     /* Submit */
     .btn-reg {
         width: 100%; padding: .82rem;
-        background: var(--navy); color: #fff;
+        background: #1c236d; color: white;
         border: none; border-radius: 10px;
-        font-family: 'Source Sans 3', sans-serif;
+        font-family: '  Book antiqua', sans-serif;
         font-size: .95rem; font-weight: 700;
         letter-spacing: .5px; cursor: pointer;
         transition: opacity .2s; margin-top: 1.3rem;
@@ -165,7 +166,7 @@
     /* Back link */
     .btn-back {
         background: transparent; border: none;
-        color: #5a6a8a; font-size: .81rem;
+        color: #1c236d; font-size: .81rem;
         cursor: pointer; padding: 0;
         display: inline-flex; align-items: center; gap: .3rem;
         font-family: 'Source Sans 3', sans-serif;
@@ -177,7 +178,7 @@
         display: inline-flex; align-items: center; gap: .35rem;
         background: #dce5f5; border: 1px solid #b0c0de;
         border-radius: 100px; padding: .28rem .8rem;
-        font-size: .76rem; color: var(--navy); font-weight: 600;
+        font-size: .76rem; color: #1c236d; font-weight: 600;
     }
 
     /* Terms */
@@ -227,7 +228,7 @@
             Students Register
         </button>
         <button type="submit" class="step1-btn"
-            onclick="document.getElementById('hidden_role').value='teacher';
+            onclick="document.getElementById('hidden_role').value='instructor';
                      document.getElementById('hidden_stype').value='';">
             <i class="bi bi-person-fill"></i>
             Staff Register
@@ -276,7 +277,7 @@
         <input type="hidden" name="role" value="{{ request.session.signup_role }}">
         <input type="hidden" name="student_type" value="{{ request.session.signup_student_type|default:'' }}">
 
-        {% if request.session.signup_role == 'teacher' or request.session.signup_role == 'moderator' %}
+        {% if request.session.signup_role == 'instructor' or request.session.signup_role == 'moderator' %}
         <div class="reg-section">Service Details</div>
         <div style="margin-bottom:.9rem;">
             <label class="form-label-sm" for="id_staff_code">Staff Code</label>
@@ -388,7 +389,7 @@
         </div>
 
         <button type="submit" class="btn-reg">
-            <i class="bi bi-shield-check me-2"></i>Register Account
+            <i class="bi bi-shield-check me-2 style="background:#1c236d"></i>Register Account
         </button>
     </form>
 
