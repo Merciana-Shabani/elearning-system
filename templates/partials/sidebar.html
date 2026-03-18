@@ -44,36 +44,54 @@
     .sidebar-logout button { border: none; background: none; padding: 0; cursor: pointer; width: 100%; text-align: left; }
 </style>
 
-<aside class="dash-sidebar">
+<aside class="dash-sidebar" id="dashSidebar">
     <div class="sidebar-brand">
         <img src="{% static 'img/tpf_logo.png' %}" alt="TPF Logo">
         <div class="sidebar-brand-name">TPF E‑LEARNING</div>
     </div>
     <nav class="sidebar-nav">
-        <a href="{% url 'users:profile' pk=user.pk %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-            <i class="bi bi-person-circle"></i>Personal Info
-        </a>
-        <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="nav-item {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-            <i class="bi bi-grid"></i>Dashboard
-        </a>
-        <a href="{% url 'enrollment:my_courses' %}" class="nav-item {% if request.resolver_match.url_name == 'my_courses' %}active{% endif %}">
-            <i class="bi bi-mortarboard-fill"></i>My Courses
-        </a>
-        <a href="{% url 'conferences:list' %}" class="nav-item {% if request.resolver_match.app_name == 'conferences' %}active{% endif %}">
-            <i class="bi bi-camera-video"></i>Live Sessions
-        </a>
-        <a href="{% url 'enrollment:assignments_done' %}" class="nav-item {% if request.resolver_match.url_name == 'assignments_done' %}active{% endif %}">
-            <i class="bi bi-graph-up-arrow"></i>Progress Tracking
-        </a>
-        <a href="{% url 'enrollment:study_list' %}" class="nav-item {% if request.resolver_match.url_name == 'study_list' %}active{% endif %}">
-            <i class="bi bi-bookmark-star"></i>Study List
-        </a>
-        <a href="{% url 'enrollment:quizzes_done' %}" class="nav-item {% if request.resolver_match.url_name == 'quizzes_done' %}active{% endif %}">
-            <i class="bi bi-patch-question"></i>Quizzes
-        </a>
-        <a href="{% url 'courses:list' %}" class="nav-item {% if request.resolver_match.app_name == 'courses' and request.resolver_match.url_name == 'list' %}active{% endif %}">
-            <i class="bi bi-book"></i>Course Catalog
-        </a>
+        {% if user.is_normal_staff %}
+            <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="nav-item {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-grid"></i>Dashboard
+            </a>
+            <a href="{% url 'courses:documents_library' %}" class="nav-item {% if request.resolver_match.view_name == 'courses:documents_library' %}active{% endif %}">
+                <i class="bi bi-folder2-open"></i>Documents Library
+            </a>
+            <a href="{% url 'courses:saved_documents' %}" class="nav-item {% if request.resolver_match.view_name == 'courses:saved_documents' %}active{% endif %}">
+                <i class="bi bi-bookmark-star"></i>Saved Documents
+                {% if saved_documents %}
+                    <span class="nav-badge">{{ saved_documents }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'users:profile' pk=user.pk %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <i class="bi bi-person"></i>My Profile
+            </a>
+        {% else %}
+            <a href="{% url 'users:profile' pk=user.pk %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <i class="bi bi-person-circle"></i>Personal Info
+            </a>
+            <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="nav-item {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-grid"></i>Dashboard
+            </a>
+            <a href="{% url 'enrollment:my_courses' %}" class="nav-item {% if request.resolver_match.url_name == 'my_courses' %}active{% endif %}">
+                <i class="bi bi-mortarboard-fill"></i>My Courses
+            </a>
+            <a href="{% url 'conferences:list' %}" class="nav-item {% if request.resolver_match.app_name == 'conferences' %}active{% endif %}">
+                <i class="bi bi-camera-video"></i>Live Sessions
+            </a>
+            <a href="{% url 'enrollment:assignments_done' %}" class="nav-item {% if request.resolver_match.url_name == 'assignments_done' %}active{% endif %}">
+                <i class="bi bi-graph-up-arrow"></i>Progress Tracking
+            </a>
+            <a href="{% url 'enrollment:study_list' %}" class="nav-item {% if request.resolver_match.url_name == 'study_list' %}active{% endif %}">
+                <i class="bi bi-bookmark-star"></i>Study List
+            </a>
+            <a href="{% url 'enrollment:quizzes_done' %}" class="nav-item {% if request.resolver_match.url_name == 'quizzes_done' %}active{% endif %}">
+                <i class="bi bi-patch-question"></i>Quizzes
+            </a>
+            <a href="{% url 'courses:list' %}" class="nav-item {% if request.resolver_match.app_name == 'courses' and request.resolver_match.url_name == 'list' %}active{% endif %}">
+                <i class="bi bi-book"></i>Course Catalog
+            </a>
+        {% endif %}
     </nav>
     <div class="sidebar-logout">
         <form method="post" action="{% url 'account_logout' %}">

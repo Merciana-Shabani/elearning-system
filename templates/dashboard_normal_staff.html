@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard — TPF Training Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --navy: #0d1f4e;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Book antiqua', sans-serif;
+        background: var(--bg) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    .dash-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    .dash-main { margin-left: 0; flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+
+
+    .dash-topbar {
+        background: var(--white);
+        border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+    .topbar-title { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; }
+    .topbar-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { text-align: right; }
+    .user-info .name { font-weight: 700; font-size: .9rem; color: #1c236d; line-height: 1.2; }
+    .role-pill {
+        display: inline-block; background: #16a34a; color: #fff;
+        font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+        text-transform: uppercase; border-radius: 100px;
+        padding: .18rem .65rem; margin-top: 3px;
+    }
+
+    .dash-content { padding: 24px 28px; flex: 1; }
+
+    .welcome-banner {
+        background: #1c236d; border-radius: 14px;
+        padding: 22px 28px; margin-bottom: 22px; color: #fff;
+    }
+    .welcome-banner .label {
+        font-size: .72rem; font-weight: 700; letter-spacing: 2px;
+        text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 4px;
+    }
+    .welcome-banner .welcome-name {
+        font-family: 'EB Garamond', serif; font-size: 1.5rem;
+        font-weight: 700; color: #fff; margin-bottom: 8px;
+    }
+    .banner-stats { display: flex; gap: 14px; flex-wrap: wrap; }
+    .banner-stat {
+        background: white; color: #1c236d;
+        border: 1px solid rgba(255,255,255,.15); border-radius: 10px;
+        padding: 14px 20px; display: flex; align-items: center;
+        gap: 12px; min-width: 150px;
+    }
+    .banner-stat-icon {
+        width: 36px; height: 36px; background: #eef1f8;
+        border-radius: 8px; display: flex; align-items: center;
+        justify-content: center; font-size: 1rem; flex-shrink: 0; color: #1c236d;
+    }
+    .banner-stat-num { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; line-height: 1; }
+    .banner-stat-label { font-size: .78rem; color: #5a6a8a; margin-top: 2px; }
+
+    .section-card { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; padding: 22px 24px; }
+    .section-title { font-family: 'EB Garamond', serif; font-size: 1.15rem; font-weight: 700; color: #1c236d; margin-bottom: 16px; }
+    .quick-btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: .55rem 1.25rem;
+        background: #1c236d;
+        color: #fff;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 700;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 8px 18px rgba(13,31,78,.15);
+        transition: transform .12s, opacity .12s;
+    }
+    .quick-btn:hover { opacity: .9; transform: translateY(-1px); color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-shell">
+    {% include 'partials/sidebar.html' %}
+
+    <div class="dash-main">
+        <div class="dash-topbar">
+            <h1 class="topbar-title">Dashboard</h1>
+            <div class="topbar-user">
+                <div class="user-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+                <div class="user-info">
+                    <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                    <div><span class="role-pill">Normal Staff</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-content">
+            <div class="welcome-banner">
+                <div class="label">WELCOME BACK</div>
+                <div class="welcome-name">{{ user.first_name|default:user.username }}</div>
+                <div class="banner-stats">
+                    <div class="banner-stat">
+                        <div class="banner-stat-icon"><i class="bi bi-file-earmark-text"></i></div>
+                        <div>
+                            <div class="banner-stat-num">{{ total_documents|default:"0" }}</div>
+                            <div class="banner-stat-label">Total Document</div>
+                        </div>
+                    </div>
+                    <div class="banner-stat">
+                        <div class="banner-stat-icon"><i class="bi bi-bookmark-fill"></i></div>
+                        <div>
+                            <div class="banner-stat-num">{{ saved_documents|default:"0" }}</div>
+                            <div class="banner-stat-label">Saved Documents</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title">Quick access Documents</div>
+                <a href="{% url 'courses:documents_library' %}" class="quick-btn">Police General Orders (PGO)</a>
+                <a href="{% url 'courses:documents_library' %}" class="quick-btn">Criminal Procedure Act (CPA)</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

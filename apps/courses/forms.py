@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit, Fieldset
-from .models import Course, CourseSection, CourseModule, CoursePage, CourseFile, CourseAnnouncement
+from .models import Course, CourseSection, CourseModule, CoursePage, CourseFile, CourseAnnouncement, Document
 
 
 class CourseForm(forms.ModelForm):
@@ -102,4 +102,13 @@ class CourseAnnouncementForm(forms.ModelForm):
         fields = ['title', 'body']
         widgets = {
             'body': forms.Textarea(attrs={'rows': 4}),
+        }
+
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ['title', 'description', 'file', 'visible']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
         }

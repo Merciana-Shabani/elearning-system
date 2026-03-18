@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Documents Library — TPF Training Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --navy: #0d1f4e;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Book antiqua', sans-serif;
+        background: var(--bg) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    .dash-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    .dash-main { margin-left: 0; flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+
+    .dash-topbar {
+        background: var(--white);
+        border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-title { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; }
+    .topbar-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { text-align: right; }
+    .user-info .name { font-weight: 700; font-size: .9rem; color: #1c236d; line-height: 1.2; }
+    .role-pill {
+        display: inline-block; background: #16a34a; color: #fff;
+        font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+        text-transform: uppercase; border-radius: 100px;
+        padding: .18rem .65rem; margin-top: 3px;
+    }
+
+    .dash-content { padding: 24px 28px; flex: 1; }
+
+    .panel { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; overflow: hidden; }
+    .panel-header { 
+        padding: 16px 18px; 
+        border-bottom: 1px solid #eef1f8; 
+        display: flex; 
+        gap: 12px; 
+        align-items: center; 
+        justify-content: space-between;
+        background: #f9fafb;
+    }
+    .panel-header h6 { margin: 0; font-weight: 800; color: #1c236d; font-family: 'EB Garamond', serif; font-size: 1.05rem; }
+    .search { display: flex; gap: 8px; align-items: center; }
+    .search input {
+        border: 1px solid #d4dae8; border-radius: 10px;
+        padding: .55rem .75rem; min-width: 240px;
+        outline: none; font-size: .9rem;
+    }
+    .search input:focus { border-color: #1c236d; box-shadow: 0 0 0 0.2rem rgba(28, 35, 109, 0.1); }
+    .btn-navy {
+        background: #1c236d; border: none; color: #fff;
+        padding: .55rem .9rem; border-radius: 10px;
+        font-weight: 700; font-size: .9rem; cursor: pointer;
+        transition: opacity .15s;
+    }
+    .btn-navy:hover { opacity: .9; }
+
+    .doc-row {
+        display: flex; gap: 14px; align-items: center;
+        padding: 14px 18px;
+        border-bottom: 1px solid #eef1f8;
+        transition: background .15s;
+    }
+    .doc-row:hover { background: #f9fafb; }
+    .doc-row:last-child { border-bottom: none; }
+    .doc-ico {
+        width: 44px; height: 44px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        background: #eef1f8; color: #1c236d;
+        flex-shrink: 0; font-size: 1.15rem;
+    }
+    .doc-meta { flex: 1; min-width: 0; }
+    .doc-title { font-weight: 800; color: #1c236d; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-sub { color: #64748b; font-size: .78rem; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-outline {
+        border: 1px solid #b0bcd4;
+        background: #fff;
+        color: #1c236d;
+        padding: .45rem .8rem;
+        border-radius: 10px;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: .82rem;
+        cursor: pointer;
+        transition: all .15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-outline:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+
+    .empty-state {
+        padding: 40px 20px;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+    .info-note {
+        margin-top: 14px;
+        color: #64748b;
+        font-size: .8rem;
+    }
+
+    .pagination { justify-content: center; margin-top: 20px; }
+    .pagination .page-link { color: #1c236d; }
+    .pagination .page-item.active .page-link { background: #1c236d; border-color: #1c236d; }
+
+    @media (max-width: 768px) {
+        .dash-main { margin-left: 0; }
+        .dash-topbar { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+        .topbar-left { width: 100%; }
+        .topbar-title { font-size: 1.25rem; }
+        .search { width: 100%; }
+        .search input { min-width: 100%; }
+        .dash-content { padding: 16px; }
+        .doc-row { flex-direction: column; align-items: flex-start; }
+        .doc-actions { width: 100%; }
+        .doc-actions .btn-outline { flex: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-shell">
+    {% include 'partials/sidebar.html' %}
+
+    <div class="dash-main">
+        <div class="dash-topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">Documents Library</h1>
+            </div>
+            <div class="topbar-user">
+                <div class="user-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+                <div class="user-info">
+                    <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                    <div><span class="role-pill">Normal Staff</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <h6>Available Documents</h6>
+                    <form method="get" class="search">
+                        <input type="search" name="q" placeholder="Search documents..." value="{{ request.GET.q|default:'' }}">
+                        <button class="btn-navy" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+                </div>
+
+                {% if documents %}
+                    {% for d in documents %}
+                    <div class="doc-row">
+                        <div class="doc-ico"><i class="bi bi-file-earmark-text"></i></div>
+                        <div class="doc-meta">
+                            <div class="doc-title">{{ d.title }}</div>
+                            <div class="doc-sub">
+                                {% if d.uploaded_by %}by {{ d.uploaded_by.get_full_name|default:d.uploaded_by.username }}{% endif %}
+                                · {{ d.created_at|date:"M d, Y" }}
+                            </div>
+                        </div>
+                        <div class="doc-actions">
+                            <a class="btn-outline" href="{% url 'courses:document_view' pk=d.pk %}" target="_blank" rel="noopener">
+                                <i class="bi bi-eye me-1"></i>Read
+                            </a>
+                            <a class="btn-outline" href="{% url 'courses:document_download' pk=d.pk %}">
+                                <i class="bi bi-download me-1"></i>Download
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        No documents found.
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="info-note">
+                Downloading a document will automatically add it to <b>Saved Documents</b>.
+            </div>
+
+            {% if is_paginated %}
+            <nav>
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Previous</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+                    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Saved Documents — TPF Training Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --navy: #0d1f4e;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body { font-family: 'Book antiqua', sans-serif; background: var(--bg) !important; margin:0 !important; padding:0 !important; }
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    .dash-shell { display:flex; min-height:100vh; background:var(--bg); }
+    .dash-main { margin-left: 0; flex:1; display:flex; flex-direction:column; min-height:100vh; background:var(--bg); }
+    .dash-topbar {
+        background: var(--white);
+        border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px;
+        display:flex; align-items:center; justify-content:space-between;
+        position: sticky; top:0; z-index:50;
+    }
+    .topbar-title { font-family:'EB Garamond', serif; font-size:1.5rem; font-weight:700; color:#1c236d; }
+    .dash-content { padding: 24px 28px; flex:1; }
+
+    .panel { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; overflow:hidden; }
+    .panel-header { padding: 16px 18px; border-bottom: 1px solid #eef1f8; display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    .panel-header h6 { margin:0; font-weight:800; color:#1c236d; font-family:'EB Garamond', serif; font-size:1.05rem; }
+
+    .doc-row {
+        display:flex; align-items:center; gap:14px;
+        padding:12px 0; border-bottom:1px solid #eef1f8;
+        text-decoration:none; color:inherit; transition:background .15s;
+    }
+    .doc-row:last-child { border-bottom:none; }
+    .doc-row:hover { background:#f4f6fb; margin:0 -18px; padding:12px 18px; }
+    .doc-icon { width: 42px; height: 42px; background: #0d1f4e; color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem; }
+    .doc-info { flex:1; min-width:0; }
+    .doc-title { font-weight: 600; font-size: .92rem; color: #1c236d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-desc { font-size: .82rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .doc-date { font-size: .75rem; color: #cbd5e1; margin-top: 4px; }
+    .doc-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .btn-primary { background: #1c236d; border: none; color: #fff; padding: .5rem .9rem; border-radius: 8px; font-weight: 600; font-size: .85rem; text-decoration: none; cursor: pointer; transition: opacity .15s; }
+    .btn-primary:hover { opacity: .88; color: #fff; }
+
+    .empty-state { text-align: center; padding: 40px 20px; background: var(--white); border-radius: 14px; }
+    .empty-state-icon { font-size: 3rem; color: #cbd5e1; margin-bottom: 12px; }
+    .empty-state-title { font-weight: 700; color: #1c236d; margin-bottom: 8px; }
+    .empty-state-text { color: #94a3b8; font-size: .9rem; }
+
+    .pagination { justify-content: center; margin-top: 20px; }
+    .pagination .page-link { color: #1c236d; }
+    .pagination .page-item.active .page-link { background: #1c236d; border-color: #1c236d; }
+
+    @media (max-width: 768px) {
+        .dash-main { margin-left: 0; }
+        .dash-topbar { padding: 12px 16px; }
+        .topbar-title { font-size: 1.25rem; }
+        .dash-content { padding: 16px; }
+        .doc-row { flex-direction: column; align-items: flex-start; }
+        .doc-actions { width: 100%; }
+        .doc-actions .btn-primary { flex: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-shell">
+    {% include 'partials/sidebar.html' %}
+    
+    <div class="dash-main">
+        <!-- Topbar -->
+        <div class="dash-topbar">
+            <h1 class="topbar-title">Saved Documents</h1>
+        </div>
+
+        <!-- Content -->
+        <div class="dash-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <h6>Your Saved Documents</h6>
+                    <div style="font-size:.85rem; color:#94a3b8;">{{ saved|length }} saved</div>
+                </div>
+
+                {% if saved %}
+                <div style="padding: 18px;">
+                    {% for s in saved %}
+                    <a href="{% url 'courses:document_view' pk=s.document.pk %}" target="_blank" rel="noopener" class="doc-row">
+                        <div class="doc-icon">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-title">{{ s.document.title }}</div>
+                            {% if s.document.description %}
+                            <div class="doc-desc">{{ s.document.description|truncatechars:120 }}</div>
+                            {% endif %}
+                            <div class="doc-date">Saved {{ s.saved_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                        <div class="doc-actions">
+                            <a class="btn-primary" href="{% url 'courses:document_view' pk=s.document.pk %}" target="_blank" rel="noopener">
+                                <i class="bi bi-eye me-1"></i>View
+                            </a>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-bookmark"></i></div>
+                    <div class="empty-state-title">No Saved Documents</div>
+                    <div class="empty-state-text">Download documents from the library to save them here.</div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if is_paginated %}
+            <nav>
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+                    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

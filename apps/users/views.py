@@ -82,13 +82,24 @@ def user_dashboard(request, pk):
 def dashboard(request):
     """Render the current user's personal dashboard (role-based content)."""
     from django.utils import timezone
-    from apps.courses.models import Course, CourseModuleCompletion, CourseCertificate
+    from apps.courses.models import Course, CourseModuleCompletion, CourseCertificate, Document, SavedDocument
     from apps.enrollment.models import Enrollment
     user = request.user
 
     enrolled_courses = user.enrollments.filter(
         status='active'
     ).select_related('course').order_by('-enrolled_at')[:6]
+
+    # Normal Staff: documents library access (no full student LMS dashboard)
+    if user.is_normal_staff:
+        total_documents = Document.objects.filter(visible=True).count()
+        saved_documents = SavedDocument.objects.filter(user=user).count()
+        context = {
+            'total_documents': total_documents,
+            'saved_documents': saved_documents,
+            'enrolled_courses': enrolled_courses,
+        }
+        return render(request, 'dashboard_normal_staff.html', context)
 
     taught_courses = []
     if user.is_instructor:
@@ -333,31 +344,4 @@ def clear_signup_type(request):
     request.session.pop('signup_role', None)
     request.session.pop('signup_student_type', None)
     request.session.modified = True
-    return redirect('account_signup')
-## Ongeza hizi kwenye views.py yako (au accounts/views.py)
-
-from django.shortcuts import redirect
-from django.views.decorators.http import require_POST
-
-@require_POST
-def set_signup_type(request):
-    """Hifadhi role kwenye session kisha redirect signup."""
-    role = request.POST.get('signup_role', '')
-    student_type = request.POST.get('signup_student_type', 'normal_staff')
-    
-    if role in ('student', 'teacher', 'moderator'):
-        request.session['signup_role'] = role
-        if role == 'student':
-            request.session['signup_student_type'] = student_type
-        else:
-            request.session['signup_student_type'] = ''
-    
-    return redirect('account_signup')
-
-
-@require_POST  
-def clear_signup_type(request):
-    
-    request.session.pop('signup_role', None)
-    request.session.pop('signup_student_type', None)
     return redirect('account_signup')

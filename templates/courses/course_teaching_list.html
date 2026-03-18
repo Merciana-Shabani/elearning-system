@@ -1,83 +1,207 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}My Courses (Instructor) — Elening LMS{% endblock %}
 
-{% block content %}
-<div class="container py-4">
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <div>
-            <h2 class="fw-bold mb-0"><i class="bi bi-person-badge me-2 text-success"></i>My Courses</h2>
-            <p class="text-muted mb-0">Create, edit, delete courses and manage learning content.</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{% url 'courses:list_all' %}" class="btn btn-outline-primary">
-                <i class="bi bi-collection me-2"></i>View all courses
-            </a>
-            <a href="{% url 'courses:create' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Create Course
-            </a>
-        </div>
-    </div>
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
 
-    {% if courses %}
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
-            <table class="table mb-0 align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Course name</th>
-                        <th>Short name</th>
-                        <th>Status</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for course in courses %}
-                    <tr>
-                        <td class="fw-semibold">{{ course.fullname }}</td>
-                        <td class="text-muted">{{ course.shortname }}</td>
-                        <td>
-                            <span class="badge {% if course.status == 'published' %}bg-success{% elif course.status == 'submitted' %}bg-info{% elif course.status == 'rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
-                                {{ course.get_status_display }}
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            <div class="btn-group btn-group-sm" role="group">
-                                {% if course.status == 'draft' or course.status == 'rejected' %}
-                                <a class="btn btn-outline-success" href="{% url 'courses:submit_for_approval' pk=course.pk %}">
-                                    Submit for approval
-                                </a>
-                                {% endif %}
-                                <a class="btn btn-outline-primary" href="{% url 'courses:content' pk=course.pk %}">Content</a>
-                                <a class="btn btn-outline-primary" href="{% url 'courses:announcements_list' pk=course.pk %}">Announcements</a>
-                                <a class="btn btn-outline-primary" href="{% url 'courses:analytics' pk=course.pk %}">Analytics</a>
-                                <a class="btn btn-outline-primary" href="{% url 'courses:certificates' pk=course.pk %}">Certificates</a>
-                                <a class="btn btn-outline-primary" href="{% url 'courses:export_reports' pk=course.pk %}">Export</a>
-                                <a class="btn btn-outline-secondary" href="{% url 'courses:edit' pk=course.pk %}">Edit</a>
-                                <a class="btn btn-outline-danger" href="{% url 'courses:delete' pk=course.pk %}">Delete</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    :root {
+        --navy: #0d1f4e;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Book antiqua', sans-serif;
+        background: var(--bg) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    .dash-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    .dash-main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+
+    .dash-topbar {
+        background: var(--white);
+        border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-title { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; }
+    .topbar-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { text-align: right; }
+    .user-info .name { font-weight: 700; font-size: .9rem; color: #1c236d; line-height: 1.2; }
+    .role-pill {
+        display: inline-block; background: #2563eb; color: #fff;
+        font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+        text-transform: uppercase; border-radius: 100px;
+        padding: .18rem .65rem; margin-top: 3px;
+    }
+
+    .dash-content { padding: 24px 28px; flex: 1; }
+
+    .content-header { margin-bottom: 24px; }
+    .content-title { font-family: 'EB Garamond', serif; font-size: 1.25rem; font-weight: 700; color: #1c236d; margin-bottom: 8px; }
+    .content-subtitle { font-size: .9rem; color: #64748b; }
+
+    .actions-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-primary { background: #1c236d; border: none; color: #fff; padding: .55rem .9rem; border-radius: 10px; font-weight: 600; font-size: .9rem; text-decoration: none; cursor: pointer; transition: opacity .15s; }
+    .btn-primary:hover { opacity: .9; color: #fff; }
+    .btn-outline { border: 1px solid #d4dae8; background: #fff; color: #1c236d; padding: .55rem .9rem; border-radius: 10px; font-weight: 600; font-size: .9rem; text-decoration: none; cursor: pointer; transition: all .15s; }
+    .btn-outline:hover { background: #1c236d; color: #fff; border-color: #1c236d; }
+
+    .table-card { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; overflow: hidden; }
+    .table-responsive { overflow-x: auto; }
+    .table { margin: 0; }
+    .table thead { background: #f9fafb; border-bottom: 1px solid #eef1f8; }
+    .table th { font-weight: 700; color: #1c236d; font-size: .9rem; padding: 14px 18px; }
+    .table td { padding: 14px 18px; border-bottom: 1px solid #eef1f8; }
+    .table tbody tr:hover { background: #f9fafb; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    .badge { font-size: .8rem; font-weight: 700; padding: .35rem .7rem; border-radius: 20px; }
+    .badge-success { background: #10b981; color: #fff; }
+    .badge-info { background: #3b82f6; color: #fff; }
+    .badge-danger { background: #ef4444; color: #fff; }
+    .badge-secondary { background: #6b7280; color: #fff; }
+
+    .btn-group { display: flex; gap: 4px; flex-wrap: wrap; }
+    .btn-group .btn { padding: .4rem .7rem; font-size: .8rem; }
+    .btn-group .btn-outline { border: 1px solid #b0bcd4; }
+    .btn-group .btn-outline:hover { background: #1c236d; color: #fff; }
+
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state-icon { font-size: 3rem; color: #cbd5e1; margin-bottom: 16px; }
+    .empty-state-title { font-weight: 700; font-size: 1.1rem; color: #1c236d; margin-bottom: 8px; }
+    .empty-state-text { color: #94a3b8; margin-bottom: 24px; }
+    .empty-state-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 768px) {
+        .dash-main { margin-left: 0; }
+        .dash-topbar { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+        .topbar-left { width: 100%; }
+        .topbar-title { font-size: 1.25rem; }
+        .dash-content { padding: 16px; }
+        .actions-group { width: 100%; }
+        .actions-group .btn-primary, .actions-group .btn-outline { flex: 1; }
+        .table-responsive { overflow-x: scroll; }
+        .btn-group { flex-direction: column; }
+        .btn-group .btn { width: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-shell">
+    {% include 'partials/sidebar.html' %}
+
+    <div class="dash-main">
+        <div class="dash-topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">My Courses</h1>
+            </div>
+            <div class="topbar-user">
+                <div class="user-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+                <div class="user-info">
+                    <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                    <div><span class="role-pill">Instructor</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-content">
+            <div class="content-header">
+                <h2 class="content-title"><i class="bi bi-person-badge me-2"></i>My Courses</h2>
+                <p class="content-subtitle">Create, edit, delete courses and manage learning content.</p>
+            </div>
+
+            <div class="actions-group">
+                <a href="{% url 'courses:list_all' %}" class="btn-outline">
+                    <i class="bi bi-collection me-2"></i>View all courses
+                </a>
+                <a href="{% url 'courses:create' %}" class="btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Create Course
+                </a>
+            </div>
+
+            {% if courses %}
+            <div class="table-card" style="margin-top: 24px;">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Course name</th>
+                                <th>Short name</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td class="fw-semibold">{{ course.fullname }}</td>
+                                <td class="text-muted">{{ course.shortname }}</td>
+                                <td>
+                                    <span class="badge {% if course.status == 'published' %}badge-success{% elif course.status == 'submitted' %}badge-info{% elif course.status == 'rejected' %}badge-danger{% else %}badge-secondary{% endif %}">
+                                        {{ course.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group" role="group">
+                                        {% if course.status == 'draft' or course.status == 'rejected' %}
+                                        <a class="btn btn-outline" href="{% url 'courses:submit_for_approval' pk=course.pk %}">
+                                            Submit
+                                        </a>
+                                        {% endif %}
+                                        <a class="btn btn-outline" href="{% url 'courses:content' pk=course.pk %}">Content</a>
+                                        <a class="btn btn-outline" href="{% url 'courses:edit' pk=course.pk %}">Edit</a>
+                                        <a class="btn btn-outline" href="{% url 'courses:delete' pk=course.pk %}" style="border-color: #ef4444; color: #ef4444;">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="table-card" style="margin-top: 24px;">
+                <div class="empty-state">
+                    <i class="bi bi-journal-plus empty-state-icon"></i>
+                    <h5 class="empty-state-title">No courses yet</h5>
+                    <p class="empty-state-text">Create your first course to start adding learning content.</p>
+                    <div class="empty-state-actions">
+                        <a href="{% url 'courses:list_all' %}" class="btn-outline">
+                            <i class="bi bi-collection me-2"></i>View all courses
+                        </a>
+                        <a href="{% url 'courses:create' %}" class="btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Create Course
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
-    {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-journal-plus text-muted" style="font-size:3rem;"></i>
-        <h5 class="mt-3">No courses yet</h5>
-        <p class="text-muted">Create your first course to start adding learning content.</p>
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <a href="{% url 'courses:list_all' %}" class="btn btn-outline-primary">
-                <i class="bi bi-collection me-2"></i>View all courses
-            </a>
-            <a href="{% url 'courses:create' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Create Course
-            </a>
-        </div>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
 

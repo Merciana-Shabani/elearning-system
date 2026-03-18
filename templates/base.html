@@ -135,6 +135,9 @@
                 <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <i class="bi bi-grid me-2"></i>Dashboard
                 </a>
+                <a href="{% url 'courses:document_upload' %}" class="sidebar-link {% if request.resolver_match.view_name == 'courses:document_upload' %}active{% endif %}">
+                    <i class="bi bi-upload me-2"></i>Upload Documents
+                </a>
                 <a href="{% url 'courses:teaching' %}" class="sidebar-link">
                     <i class="bi bi-book me-2"></i>Courses
                 </a>
@@ -155,6 +158,27 @@
                     <i class="bi bi-gear me-2"></i>Settings
                 </a>
 
+                {% else %}
+                {% if user.is_normal_staff %}
+                <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="bi bi-grid me-2"></i>Dashboard
+                </a>
+                <a href="{% url 'courses:documents_library' %}" class="sidebar-link {% if request.resolver_match.view_name == 'courses:documents_library' %}active{% endif %}">
+                    <i class="bi bi-folder2-open me-2"></i>Documents Library
+                </a>
+                <a href="{% url 'courses:saved_documents' %}" class="sidebar-link d-flex align-items-center justify-content-between {% if request.resolver_match.view_name == 'courses:saved_documents' %}active{% endif %}">
+                    <span><i class="bi bi-bookmark-star me-2"></i>Saved Documents</span>
+                    {% if saved_documents %}
+                    <span class="badge bg-danger rounded-pill ms-2">{{ saved_documents }}</span>
+                    {% endif %}
+                </a>
+                <div class="sidebar-section-label">Account</div>
+                <a href="{% url 'users:profile' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.view_name == 'users:profile' %}active{% endif %}">
+                    <i class="bi bi-person me-2"></i>My Profile
+                </a>
+                <a href="{% url 'users:edit_profile' %}" class="sidebar-link {% if request.resolver_match.view_name == 'users:edit_profile' %}active{% endif %}">
+                    <i class="bi bi-gear me-2"></i>Settings
+                </a>
                 {% else %}
                 <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <i class="bi bi-grid me-2"></i>Dashboard
@@ -190,6 +214,7 @@
                 <a href="{% url 'users:edit_profile' %}" class="sidebar-link {% if request.resolver_match.view_name == 'users:edit_profile' %}active{% endif %}">
                     <i class="bi bi-gear me-2"></i>Settings
                 </a>
+                {% endif %}
                 {% endif %}
 
             </div>

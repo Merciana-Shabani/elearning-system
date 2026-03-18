@@ -5,6 +5,12 @@ app_name = 'courses'
 
 urlpatterns = [
     path('', views.CourseListView.as_view(), name='list'),
+    # Documents (Instructor upload, Normal Staff library + saved)
+    path('documents/', views.DocumentsLibraryView.as_view(), name='documents_library'),
+    path('documents/saved/', views.SavedDocumentsView.as_view(), name='saved_documents'),
+    path('documents/upload/', views.DocumentUploadView.as_view(), name='document_upload'),
+    path('documents/<int:pk>/view/', views.document_view, name='document_view'),
+    path('documents/<int:pk>/download/', views.document_download, name='document_download'),
     path('teaching/', views.CourseTeachingListView.as_view(), name='teaching'),
     path('all/', views.CourseAllTableView.as_view(), name='list_all'),
     path('create/', views.CourseCreateView.as_view(), name='create'),

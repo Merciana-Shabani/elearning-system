@@ -15,10 +15,12 @@ from django.conf import settings
 from .models import (
     Course, CourseCategory, CourseSection, CourseModule, CoursePage, CourseFile,
     CourseAnnouncement, CourseModuleCompletion, CourseCertificate,
+    Document, SavedDocument,
 )
 from .forms import (
     CourseForm, CourseSectionForm, CourseModuleForm, CoursePageForm, CourseFileForm,
     CourseAnnouncementForm,
+    DocumentForm,
 )
 
 
@@ -57,6 +59,108 @@ class CourseListView(ListView):
             context['enrolled_course_ids'] = set()
         return context
 
+
+class DocumentsLibraryView(LoginRequiredMixin, ListView):
+    """Normal Staff: browse all uploaded documents."""
+    model = Document
+    template_name = 'documents/library.html'
+    context_object_name = 'documents'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_normal_staff:
+            messages.error(request, 'Access denied.')
+            return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = Document.objects.filter(visible=True)
+        q = (self.request.GET.get('q') or '').strip()
+        if q:
+            qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
+        return qs.order_by('-created_at')
+
+
+class SavedDocumentsView(LoginRequiredMixin, ListView):
+    """Normal Staff: list documents auto-saved on download."""
+    model = SavedDocument
+    template_name = 'documents/saved.html'
+    context_object_name = 'saved'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_normal_staff:
+            messages.error(request, 'Access denied.')
+            return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return (
+            SavedDocument.objects.filter(user=self.request.user)
+            .select_related('document', 'document__uploaded_by')
+            .order_by('-saved_at')
+        )
+
+
+class DocumentUploadView(TeacherRequiredMixin, CreateView):
+    """Instructor: upload a standalone document for Normal Staff."""
+    model = Document
+    form_class = DocumentForm
+    template_name = 'documents/upload.html'
+
+    def form_valid(self, form):
+        form.instance.uploaded_by = self.request.user
+        messages.success(self.request, 'Document uploaded successfully.')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('courses:document_upload')
+
+
+@login_required
+def document_download(request, pk):
+    """Normal Staff: download a document; auto-save to Saved Documents."""
+    if not request.user.is_normal_staff:
+        raise Http404('You do not have access to this content.')
+    doc = get_object_or_404(Document, pk=pk, visible=True)
+    if not doc.file:
+        raise Http404('File not found.')
+    SavedDocument.objects.get_or_create(user=request.user, document=doc)
+    filename = os.path.basename(doc.file.name)
+    if doc.title:
+        ext = os.path.splitext(filename)[1]
+        filename = slugify(doc.title)[:50] + (ext or '')
+    as_attachment = True
+    try:
+        file_handle = doc.file.open('rb')
+        return FileResponse(file_handle, as_attachment=as_attachment, filename=filename)
+    except (ValueError, OSError, AttributeError):
+        from django.http import HttpResponseRedirect
+        return HttpResponseRedirect(doc.file.url)
+
+
+@login_required
+def document_view(request, pk):
+    """Normal Staff: open a document inline (read in browser)."""
+    if not request.user.is_normal_staff:
+        raise Http404('You do not have access to this content.')
+    doc = get_object_or_404(Document, pk=pk, visible=True)
+    if not doc.file:
+        raise Http404('File not found.')
+    # Ensure it is saved once they open it for reading.
+    SavedDocument.objects.get_or_create(user=request.user, document=doc)
+    filename = os.path.basename(doc.file.name)
+    if doc.title:
+        ext = os.path.splitext(filename)[1]
+        filename = slugify(doc.title)[:50] + (ext or '')
+    try:
+        file_handle = doc.file.open('rb')
+        response = FileResponse(file_handle, as_attachment=False, filename=filename)
+        response['Content-Disposition'] = 'inline; filename="{}"'.format(filename)
+        return response
+    except (ValueError, OSError, AttributeError):
+        from django.http import HttpResponseRedirect
+        return HttpResponseRedirect(doc.file.url)
 
 class CourseTeachingListView(TeacherRequiredMixin, ListView):
     """Instructor: list courses owned by the current instructor (all statuses)."""

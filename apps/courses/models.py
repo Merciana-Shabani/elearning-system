@@ -384,3 +384,44 @@ class CourseCertificate(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.course} (issued {self.issued_at.date()})'
+
+
+class Document(models.Model):
+    """Standalone documents uploaded by instructors for Normal Staff access."""
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    file = models.FileField(upload_to='documents/')
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='uploaded_documents'
+    )
+    visible = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'elening_documents'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
+
+
+class SavedDocument(models.Model):
+    """Tracks documents saved by a user (auto-saved on download)."""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='saved_documents'
+    )
+    document = models.ForeignKey(
+        Document, on_delete=models.CASCADE, related_name='saved_by'
+    )
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # NOTE: 'elening_saved_documents' already exists in DB for course-file downloads.
+        # Use a separate table for library-document saves.
+        db_table = 'elening_saved_library_documents'
+        unique_together = ('user', 'document')
+        ordering = ['-saved_at']
+
+    def __str__(self):
+        return f'{self.user} saved {self.document}'
