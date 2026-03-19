@@ -82,7 +82,7 @@
     .sidebar-logout a:hover { color: var(--navy); }
 
     /* ── MAIN ── */
-    .dash-main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+    .dash-main { margin-left: 0; flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
 
     /* Topbar */
     .dash-topbar {
@@ -254,52 +254,7 @@
 <div class="dash-shell">
 
     <!-- ══════ SIDEBAR ══════ -->
-    <aside class="dash-sidebar" id="dashSidebar">
-        <div class="sidebar-brand">
-            <img src="{% static 'img/tpf_logo.png' %}" alt="TPF Logo">
-            <div class="sidebar-brand-name">TPF E-Learning</div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <a href="{% url 'dashboard' %}" class="nav-item active">
-                <i class="bi bi-grid-fill"></i> Dashboard
-            </a>
-            <a href="{% url 'courses:teaching' %}" class="nav-item">
-                <i class="bi bi-book-fill"></i> Courses
-                {% if courses_teaching_count %}<span class="nav-badge-grey">{{ courses_teaching_count }}</span>{% endif %}
-            </a>
-            <a href="{% url 'courses:create' %}" class="nav-item">
-                <i class="bi bi-plus-circle-fill"></i> Create Course
-            </a>
-            <a href="{% url 'conferences:list' %}" class="nav-item">
-                <i class="bi bi-camera-video-fill"></i> Live Meeting
-            </a>
-            <a href="{% url 'quizzes:list' %}" class="nav-item">
-                <i class="bi bi-patch-question-fill"></i> Quiz
-            </a>
-            <a href="{% url 'assignments:teaching_list' %}" class="nav-item">
-                <i class="bi bi-file-earmark-check-fill"></i> Assignments
-                {% if pending_submissions_my %}<span class="nav-badge">{{ pending_submissions_my }}</span>{% endif %}
-            </a>
-            <a href="{% url 'enrollment:study_list' %}" class="nav-item">
-                <i class="bi bi-bookmark-fill"></i> Study list
-            </a>
-
-            <span class="nav-section">Account</span>
-            <a href="{% url 'users:profile' pk=request.user.pk %}" class="nav-item">
-                <i class="bi bi-person-fill"></i> Profile
-            </a>
-            <a href="{% url 'messaging:inbox' %}" class="nav-item">
-                <i class="bi bi-envelope-fill"></i> Messages
-            </a>
-        </nav>
-
-        <div class="sidebar-logout">
-            <a href="{% url 'account_logout' %}">
-                <i class="bi bi-box-arrow-left"></i> Logout
-            </a>
-        </div>
-    </aside>
+    {% include 'partials/sidebar.html' %}
 
     <!-- ══════ MAIN ══════ -->
     <div class="dash-main">

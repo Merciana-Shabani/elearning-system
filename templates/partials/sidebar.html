@@ -73,6 +73,11 @@
             <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="nav-item {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                 <i class="bi bi-grid"></i>Dashboard
             </a>
+            {% if user.is_instructor %}
+            <a href="{% url 'courses:document_upload' %}" class="nav-item {% if request.resolver_match.view_name == 'courses:document_upload' %}active{% endif %}">
+                <i class="bi bi-cloud-arrow-up"></i>Upload Documents
+            </a>
+            {% endif %}
             <a href="{% url 'enrollment:my_courses' %}" class="nav-item {% if request.resolver_match.url_name == 'my_courses' %}active{% endif %}">
                 <i class="bi bi-mortarboard-fill"></i>My Courses
             </a>

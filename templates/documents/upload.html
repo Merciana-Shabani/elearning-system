@@ -1,31 +1,120 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block title %}Upload Document — TPF Training Portal{% endblock %}
 
-{% block content %}
-<div class="container py-4" style="max-width: 820px;">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-        <div>
-            <h3 class="mb-1" style="color:#0d2b4e;">Upload Document</h3>
-            <div class="text-muted" style="font-size:.92rem;">Uploaded documents will appear in Normal Staff “Documents Library”.</div>
-        </div>
-        <a class="btn btn-outline-secondary" href="{% url 'courses:teaching' %}">
-            <i class="bi bi-arrow-left me-1"></i>Back to Courses
-        </a>
-    </div>
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <button class="btn btn-primary" type="submit">
-                    <i class="bi bi-upload me-1"></i>Upload
-                </button>
-            </form>
+    :root {
+        --navy: #0d1f4e;
+        --bg: #e8eef7;
+        --sidebar-w: 240px;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Book antiqua', sans-serif;
+        background: var(--bg) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    nav.navbar, .navbar, body > nav, .tpf-top-header { display: none !important; }
+    body, main, #main-content, [role="main"], .container-fluid { padding-top: 0 !important; margin-top: 0 !important; }
+    .tpf-footer { margin-left: var(--sidebar-w); }
+
+    .dash-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    .dash-main { margin-left: 0; flex: 1; display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
+
+    .dash-topbar {
+        background: var(--white);
+        border-bottom: 1px solid #d4dae8;
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-title { font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1c236d; }
+    .topbar-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        background: #1c236d; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { text-align: right; }
+    .user-info .name { font-weight: 700; font-size: .9rem; color: #1c236d; line-height: 1.2; }
+    .role-pill {
+        display: inline-block; background: #2563eb; color: #fff;
+        font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+        text-transform: uppercase; border-radius: 100px;
+        padding: .18rem .65rem; margin-top: 3px;
+    }
+
+    .dash-content { padding: 24px 28px; flex: 1; }
+
+    .content-header { margin-bottom: 24px; }
+    .content-title { font-family: 'EB Garamond', serif; font-size: 1.25rem; font-weight: 700; color: #1c236d; margin-bottom: 8px; }
+    .content-subtitle { font-size: .9rem; color: #64748b; }
+
+    .card { background: var(--white); border: 1px solid #d4dae8; border-radius: 14px; overflow: hidden; }
+    .card-body { padding: 24px 28px; }
+    .btn-primary { background: #1c236d; border: none; color: #fff; padding: .55rem .9rem; border-radius: 10px; font-weight: 600; font-size: .9rem; text-decoration: none; cursor: pointer; transition: opacity .15s; }
+    .btn-primary:hover { opacity: .9; color: #fff; }
+
+    @media (max-width: 768px) {
+        .dash-main { margin-left: 0; }
+        .dash-topbar { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+        .topbar-left { width: 100%; }
+        .topbar-title { font-size: 1.25rem; }
+        .dash-content { padding: 16px; }
+        .card-body { padding: 16px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-shell">
+    {% include 'partials/sidebar.html' %}
+
+    <div class="dash-main">
+        <div class="dash-topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">Upload Document</h1>
+            </div>
+            <div class="topbar-user">
+                <div class="user-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+                <div class="user-info">
+                    <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                    <div><span class="role-pill">Instructor</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-content">
+            <div class="content-header">
+                <p class="content-subtitle">Uploaded documents will appear in Normal Staff "Documents Library".</p>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-upload me-1"></i>Upload
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
-

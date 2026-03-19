@@ -127,46 +127,7 @@
 
 {% block content %}
 <div class="dash-shell">
-    <!-- SIDEBAR -->
-    <aside class="dash-sidebar">
-        <div class="sidebar-brand">
-            <img src="{% static 'img/tpf_logo.png' %}" alt="TPF Logo">
-            <div class="sidebar-brand-name">TPF E‑LEARNING</div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="{% url 'users:user_dashboard' pk=user.pk %}" class="nav-item {% if request.resolver_match.url_name == 'user_dashboard' or request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                <i class="bi bi-grid"></i>Dashboard
-            </a>
-            <a href="{% url 'enrollment:my_courses' %}" class="nav-item {% if request.resolver_match.url_name == 'my_courses' %}active{% endif %}">
-                <i class="bi bi-mortarboard-fill"></i>My Courses
-            </a>
-            <a href="{% url 'conferences:list' %}" class="nav-item {% if request.resolver_match.app_name == 'conferences' %}active{% endif %}">
-                <i class="bi bi-camera-video"></i>Live Sessions
-            </a>
-            <a href="{% url 'enrollment:assignments_done' %}" class="nav-item {% if request.resolver_match.url_name == 'assignments_done' %}active{% endif %}">
-                <i class="bi bi-graph-up-arrow"></i>Progress Tracking
-            </a>
-            <a href="{% url 'enrollment:study_list' %}" class="nav-item {% if request.resolver_match.url_name == 'study_list' %}active{% endif %}">
-                <i class="bi bi-bookmark-star"></i>Study List
-            </a>
-            <a href="{% url 'enrollment:quizzes_done' %}" class="nav-item {% if request.resolver_match.url_name == 'quizzes_done' %}active{% endif %}">
-                <i class="bi bi-patch-question"></i>Quizzes
-            </a>
-            <a href="{% url 'courses:list' %}" class="nav-item {% if request.resolver_match.app_name == 'courses' and request.resolver_match.url_name == 'list' %}active{% endif %}">
-                <i class="bi bi-book"></i>Course Catalog
-            </a>
-        </nav>
-        <div class="sidebar-logout">
-            <form method="post" action="{% url 'account_logout' %}" style="margin: 0;">
-                {% csrf_token %}
-                <button type="submit" style="border: none; background: none; padding: 0; cursor: pointer; width: 100%; text-align: left;">
-                    <a style="display: flex; align-items: center; gap: 8px; color: #666; font-size: .88rem; text-decoration: none; font-weight: 500;">
-                        <i class="bi bi-box-arrow-right"></i>Sign Out
-                    </a>
-                </button>
-            </form>
-        </div>
-    </aside>
+    {% include 'partials/sidebar.html' %}
 
     <!-- MAIN CONTENT -->
     <div class="dash-main">
@@ -177,7 +138,15 @@
                 <div class="user-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
                 <div class="user-info">
                     <div class="name">{{ user.get_full_name|default:user.username }}</div>
-                    <div class="role"><span class="role-pill">Student</span></div>
+                    <div>
+                        {% if user.is_instructor %}
+                            <span class="role-pill" style="background: #2563eb;">Instructor</span>
+                        {% elif user.is_normal_staff %}
+                            <span class="role-pill" style="background: #7c3aed;">Staff</span>
+                        {% else %}
+                            <span class="role-pill" style="background: #16a34a;">Student</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
